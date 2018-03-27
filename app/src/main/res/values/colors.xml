@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#373a41</color>
+    <color name="colorPrimaryDark">#2d3134</color>
+    <color name="colorAccent">#373a41</color>
+    <color name="scan_corner_color">#0effc2</color>
+
+    <color name="primaryText">#212121</color>
+    <color name="secondaryText">#757575</color>
+    <color name="white_Fa">#FAFAFA</color>
+    <color name="background">#EAEAEA</color>
+    <color name="goodstext">#8a8164</color>
+    <color name="goodsbg">#f1eae2</color>
+    <color name="cookbookText">#333333</color>
+    <color name="articleText">#868686</color>
+    <color name="transparent">#0000</color>
+    <color name="divider">#e6e6e6</color>
+</resources>
