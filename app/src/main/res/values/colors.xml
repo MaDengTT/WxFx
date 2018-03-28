@@ -15,4 +15,5 @@
     <color name="articleText">#868686</color>
     <color name="transparent">#0000</color>
     <color name="divider">#e6e6e6</color>
+    <color name="colorDefault">#fcd001</color>
 </resources>

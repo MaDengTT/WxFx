@@ -5,14 +5,18 @@ import android.util.Log;
 import com.xxm.mmd.wxfx.bean.BannerImage;
 import com.xxm.mmd.wxfx.bean.DataWx;
 import com.xxm.mmd.wxfx.bean.UpdateSys;
+import com.xxm.mmd.wxfx.bean.UserBean;
 
 
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobSMS;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.LogInListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UploadBatchListener;
@@ -150,6 +154,42 @@ public class BmobUtils {
             }
         });
 
+    }
+
+    public static Observable<Integer> requestSMSLOGCODE(final String phoneNum) {
+        return Observable.create(new ObservableOnSubscribe<Integer>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Integer> emitter) throws Exception {
+                BmobSMS.requestSMSCode(phoneNum, "login", new QueryListener<Integer>() {
+                    @Override
+                    public void done(Integer integer, BmobException e) {
+                        if (e == null) {
+                            emitter.onNext(integer);
+                        }else{
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<UserBean> signOrLoginByMobilePhone(final String phoneNum, final String vCode) {
+        return Observable.create(new ObservableOnSubscribe<UserBean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<UserBean> emitter) throws Exception {
+                BmobUser.signOrLoginByMobilePhone(phoneNum, vCode, new LogInListener<UserBean>() {
+                    @Override
+                    public void done(UserBean userBean, BmobException e) {
+                        if (userBean != null) {
+                            emitter.onNext(userBean);
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
     }
 
 }

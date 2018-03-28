@@ -1,0 +1,157 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.xxm.mmd.wxfx.ui.my.MyFragment">
+
+
+    <ImageView
+        android:background="@color/colorPrimary"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintDimensionRatio="1.125:1"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.xxm.mmd.wxfx.view.RCRelativeLayout
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="40dp"
+                    android:layout_marginBottom="40dp"
+                    android:id="@+id/rc_avatar"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp">
+
+                    <ImageView
+                        android:id="@+id/iv_avatar"
+                        android:src="@drawable/avatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </com.xxm.mmd.wxfx.view.RCRelativeLayout>
+
+                <TextView
+                    app:layout_constraintLeft_toRightOf="@+id/rc_avatar"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/tv_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:text="下过晴天的雨"
+                    android:textSize="@dimen/text_title_size"
+                    app:layout_constraintTop_toTopOf="@+id/rc_avatar"
+                    app:layout_constraintBottom_toTopOf="@+id/tv_user_info"
+                    />
+
+                <TextView
+                    app:layout_constraintLeft_toLeftOf="@id/tv_user_name"
+                    android:id="@+id/tv_user_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_hint_size"
+                    android:text="等你下课"
+                    app:layout_constraintBottom_toBottomOf="@+id/rc_avatar"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_user_name"
+                    />
+
+            </android.support.constraint.ConstraintLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:background="@color/background"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:id="@+id/rl_my_order"
+                    android:orientation="horizontal"
+                    android:background="@color/white_Fa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="我的订单"
+                        android:textSize="@dimen/text_context_size"
+                        android:textColor="@color/primaryText"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        />
+
+                    <ImageView
+                        android:src="@drawable/ic_navigate_next_black_24dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="16dp"
+                        />
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:background="@color/white_Fa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="我的服务"
+                        android:textSize="@dimen/text_context_size"
+                        android:textColor="@color/primaryText"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        />
+
+                </RelativeLayout>
+                <RelativeLayout
+                    android:descendantFocusability="blocksDescendants"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:layout_marginBottom="12dp"
+                        android:id="@+id/recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</android.support.constraint.ConstraintLayout>

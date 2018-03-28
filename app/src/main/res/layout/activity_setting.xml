@@ -8,6 +8,8 @@
     android:layout_height="match_parent"
     tools:context="com.xxm.mmd.wxfx.ui.SettingActivity">
 
+    <include layout="@layout/title_layout" />
+
     <RelativeLayout
         android:id="@+id/ll_action"
         android:orientation="horizontal"

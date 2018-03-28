@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.LoginActivity">
+
+    <include layout="@layout/title_layout" />
+
+    <android.support.constraint.ConstraintLayout
+        android:background="@color/white_Fa"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.AppCompatEditText
+            android:drawablePadding="8dp"
+            android:drawableLeft="@drawable/ic_stay_primary_portrait_black_24dp"
+            android:id="@+id/tv_phone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="8dp"
+            android:background="@null"
+            android:hint="请输入正确的手机号"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:textSize="@dimen/text_context_size"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.2" />
+        <View
+            android:background="@color/divider"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_phone"
+            app:layout_constraintRight_toRightOf="@+id/tv_phone"
+            app:layout_constraintTop_toBottomOf="@+id/tv_phone"
+            android:layout_width="0dp"
+            android:layout_height="1px"/>
+        <android.support.v7.widget.AppCompatEditText
+            android:drawableLeft="@drawable/ic_textsms_black_24dp"
+            android:drawablePadding="8dp"
+            app:layout_constraintRight_toLeftOf="@+id/tv_but_vCode"
+            app:layout_constraintTop_toBottomOf="@id/tv_phone"
+            android:id="@+id/tv_vCode"
+            app:layout_constraintLeft_toLeftOf="@id/tv_phone"
+            android:background="@null"
+            android:hint="请输入验证码"
+            android:textSize="@dimen/text_context_size"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            app:layout_constraintTop_toBottomOf="@+id/tv_phone"
+            app:layout_constraintRight_toRightOf="@+id/tv_phone"
+            android:id="@+id/tv_but_vCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_context_size"
+            android:text="获取验证码"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            />
+        <View
+            android:background="@color/divider"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_phone"
+            app:layout_constraintRight_toRightOf="@+id/tv_phone"
+            app:layout_constraintTop_toBottomOf="@+id/tv_vCode"
+            android:layout_width="0dp"
+            android:layout_height="1px"/>
+
+        <TextView
+            android:id="@+id/tv_but_login"
+            android:text="登陆"
+            app:layout_constraintRight_toRightOf="@+id/tv_phone"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_phone"
+            android:gravity="center"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:background="@color/colorDefault"
+            android:textColor="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@+id/tv_vCode"
+            android:layout_marginTop="32dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</LinearLayout>

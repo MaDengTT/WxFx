@@ -1,5 +1,6 @@
 package com.xxm.mmd.wxfx.utils;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,9 +13,20 @@ import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.xxm.mmd.wxfx.bean.DataWx;
+import com.xxm.mmd.wxfx.ui.MainActivity;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 /**
  * Created by Administrator on 2018/3/17.
@@ -124,5 +136,39 @@ public class WeiXinShareUtil {
         shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
         shareIntent.setType("image/*");
         context.startActivity(Intent.createChooser(shareIntent, "分享到"));
+    }
+
+    public static void shareDataToWx(String id, final Activity activity) {
+        String ids = SysUtils.getStringID(id);
+        BmobUtils.loadDataToBmob(ids)
+                .flatMap(new Function<DataWx, ObservableSource<DataWx>>() {
+                    @Override
+                    public ObservableSource<DataWx> apply(final DataWx wx) throws Exception {
+                        return io.reactivex.Observable.create(new ObservableOnSubscribe<DataWx>() {
+                            @Override
+                            public void subscribe(final ObservableEmitter<DataWx> emitter) throws Exception {
+                                ImageUtils.loadImageForGlide(wx.getImage())
+                                        .subscribe(new Consumer<List<String>>() {
+                                            @Override
+                                            public void accept(List<String> strings) throws Exception {
+                                                wx.setImage(strings);
+                                                emitter.onNext(wx);
+                                            }
+                                        });
+                            }
+                        });
+                    }
+                })
+                .subscribe(new Consumer<DataWx>() {
+                    @Override
+                    public void accept(DataWx wx) throws Exception {
+                        sharePhotosToWx(activity,wx.getText(),wx.getImage());
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("tt", "accept: ",throwable );
+                    }
+                });
     }
 }

@@ -1,210 +1,153 @@
 package com.xxm.mmd.wxfx.ui;
 
-import android.app.ActivityManager;
-import android.app.ProgressDialog;
+
+
 import android.content.Context;
-import android.content.DialogInterface;
+
 import android.content.Intent;
-import android.provider.Settings;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AlertDialog;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
-import android.text.TextUtils;
+
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.lzy.imagepicker.loader.ImageLoader;
-import com.uuzuche.lib_zxing.activity.CaptureActivity;
+import com.ashokvarma.bottomnavigation.BottomNavigationBar;
+import com.ashokvarma.bottomnavigation.BottomNavigationItem;
+
 import com.uuzuche.lib_zxing.activity.CodeUtils;
-import com.uuzuche.lib_zxing.activity.ZXingLibrary;
-import com.xxm.mmd.wxfx.BuildConfig;
+
 import com.xxm.mmd.wxfx.R;
-import com.xxm.mmd.wxfx.bean.BannerImage;
-import com.xxm.mmd.wxfx.bean.DataWx;
+
 import com.xxm.mmd.wxfx.bean.UpdateSys;
+import com.xxm.mmd.wxfx.ui.find.FindFragment;
+import com.xxm.mmd.wxfx.ui.function.FunctionFragment;
+import com.xxm.mmd.wxfx.ui.home.HomeFragment;
+import com.xxm.mmd.wxfx.ui.my.MyFragment;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
-import com.xxm.mmd.wxfx.utils.FileUtils;
-import com.xxm.mmd.wxfx.utils.ImageUtils;
+
 import com.xxm.mmd.wxfx.utils.SysUtils;
 import com.xxm.mmd.wxfx.utils.UpdateManager;
 import com.xxm.mmd.wxfx.utils.WeiXinShareUtil;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Observable;
-
-import abc.abc.abc.nm.bn.BannerManager;
-import abc.abc.abc.nm.bn.BannerViewListener;
-import abc.abc.abc.nm.cm.ErrorCode;
-
-
-import abc.abc.abc.nm.sp.SpotListener;
-import abc.abc.abc.nm.sp.SpotManager;
-import abc.abc.abc.nm.sp.SpotRequestListener;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+
+public class MainActivity extends AppCompatActivity{
+
+    BottomNavigationBar bottomNavigationBar;
+
+    HomeFragment homeFragment;
+
+    MyFragment myFragment;
+
+    FindFragment findFragment;
+    FunctionFragment functionFragment;
+    private Fragment[] fragments;
+
+    private int lastindex = 0;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, MainActivity.class);
         context.startActivity(starter);
     }
 
-    private int REQUEST_CODE = 0x222;
-
-    private CardView cvUpdate,cvScan,cvSetting,cvHelp, cvAbount;
-
-    ProgressDialog dialog;
-
-    private ImageView ivBanner;
+    public static int REQUEST_CODE = 0x222;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SpotManager.getInstance(this).requestSpot(new SpotRequestListener() {
-            @Override
-            public void onRequestSuccess() {
-                Log.d("SplashActivity", "onRequestSuccess");
-            }
-
-            @Override
-            public void onRequestFailed(int i) {
-                Log.d("RequesSplashActivity", "onFailde:" + i);
-            }
-        });
-
-        initView();
-
         update();
-
-//        initBannerView();
-
-        initBannerImage();
-
+        initFragment();
+        initView();
     }
 
-
-
-    private void initBannerImage() {
-        BmobUtils.getImage()
-                .subscribe(new Consumer<BannerImage>() {
-                    @Override
-                    public void accept(BannerImage bannerImage) throws Exception {
-                        if (bannerImage != null && !TextUtils.isEmpty(bannerImage.getImageUrl())) {
-                            Glide.with(MainActivity.this).load(bannerImage.getImageUrl())
-                                    .error(R.drawable.ic_banner).into(ivBanner);
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.d("img", "accept: 没有图片");
-                    }
-                });
+    private void initFragment() {
+        homeFragment = HomeFragment.newInstance();
+        myFragment = MyFragment.newInstance();
+        findFragment = FindFragment.newInstance();
+        functionFragment = FunctionFragment.newInstance();
+        fragments = new Fragment[]{homeFragment, functionFragment,findFragment,myFragment};
     }
 
-
-    private void initBannerView() {
-//        LinearLayout banner = findViewById(R.id.ll_banner);
-        View bannerView = BannerManager.getInstance(this).getBannerView(this, new BannerViewListener() {
+    private void initView() {
+        bottomNavigationBar = findViewById(R.id.bottom_navigation_bar);
+        bottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED)
+                .setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
+//        bottomNavigationBar.setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_RIPPLE);
+        bottomNavigationBar
+                .addItem(new BottomNavigationItem(R.drawable.ic_about, "主页").setActiveColor(R.color.colorDefault))
+                .addItem(new BottomNavigationItem(R.drawable.ic_help,"功能").setActiveColor(R.color.colorDefault))
+                .addItem(new BottomNavigationItem(R.drawable.ic_launcher,"发现").setActiveColor(R.color.colorDefault))
+                .addItem(new BottomNavigationItem(R.drawable.ic_setting,"我的").setActiveColor(R.color.colorDefault))
+                .initialise();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment, homeFragment).show(homeFragment).commit();
+        bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {
             @Override
-            public void onRequestSuccess() {
-                Log.d("MainActivity", "Success");
+            public void onTabSelected(int position) {
+
+                if (lastindex != position) {
+                    switchFrament(lastindex,position);
+                    lastindex = position;
+                }
+//                switch (position) {
+//                    case 0:
+//                        if (lastindex != 0) {
+//                            switchFrament(lastindex,0);
+//                            lastindex = 0;
+//                        }
+//                        break;
+//                    case 1:
+//                        if (lastindex != 1) {
+//                            switchFrament(lastindex,1);
+//                            lastindex = 1;
+//                        }
+//                        break;
+//                }
             }
 
             @Override
-            public void onSwitchBanner() {
-                Log.d("MainActivity", "Switch");
+            public void onTabUnselected(int position) {
+
             }
 
             @Override
-            public void onRequestFailed() {
-                Log.d("MainActivity", "Failed");
+            public void onTabReselected(int position) {
+
             }
         });
-//        banner.addView(bannerView);
+
+        bottomNavigationBar.selectTab(0,false);
     }
 
 
-    private void initYouMi() {
-        SpotManager.getInstance(this).setImageType(SpotManager.IMAGE_TYPE_VERTICAL);
-        SpotManager.getInstance(this).setAnimationType(SpotManager.ANIMATION_TYPE_ADVANCED);
-        SpotManager.getInstance(this).showSpot(this, new SpotListener() {
-            @Override
-            public void onShowSuccess() {
-                Log.d("MainActivity", "showSuccess".toString());
-            }
-
-            @Override
-            public void onShowFailed(int i) {
-                Log.d("MainActivity", "i:" + i);
-            }
-
-            @Override
-            public void onSpotClosed() {
-                if (BuildConfig.DEBUG) Log.d("MainActivity", "结束");
-            }
-
-            @Override
-            public void onSpotClicked(boolean b) {
-                Log.d("MainActivity", "isClicked:" + b);
-            }
-        });
+    /**
+     * 切换Fragment
+     *
+     * @param lastIndex 上个显示Fragment的索引
+     * @param index     需要显示的Fragment的索引
+     */
+    public void switchFrament(int lastIndex, int index) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.hide(fragments[lastIndex]);
+        if (!fragments[index].isAdded()) {
+            transaction.add(R.id.fragment, fragments[index]);
+        }
+        transaction.show(fragments[index]).commitAllowingStateLoss();
     }
 
     @Override
     public void onBackPressed() {
-        if (SpotManager.getInstance(this).isSlideableSpotShowing()) {
-//            SpotManager.getInstance(this).hideSlideableSpot();
-            return;
-        }else {
-            super.onBackPressed();
-        }
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-//        SpotManager.getInstance(this).onStop();
-    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-//        SpotManager.getInstance(this).onDestroy();
-//        SpotManager.getInstance(this).onAppExit();
-//        BannerManager.getInstance(this).onDestroy();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (dialog!=null&&dialog.isShowing()) {
-            dialog.dismiss();
-        }
-//        SpotManager.getInstance(this).onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        initYouMi();
-    }
 
     private void update() {
 
@@ -213,14 +156,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void accept(UpdateSys updateSys) throws Exception {
                         if (updateSys != null) {
-//                            Log.d(TAG, updateSys.toString());
                             update(updateSys);
                         }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-//                        Toast.makeText(MainActivity.this, throwable.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -237,26 +178,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         manager.showNoticeDialog(true);
     }
 
-    private void initView() {
-
-        ivBanner = findViewById(R.id.iv_banner);
-
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("请稍后");
-        dialog.setCanceledOnTouchOutside(false);
-
-        cvUpdate = findViewById(R.id.cv_update);
-        cvScan = findViewById(R.id.cv_scan);
-        cvSetting = findViewById(R.id.cv_setting);
-        cvHelp = findViewById(R.id.cv_help);
-        cvAbount = findViewById(R.id.cv_about);
-
-        cvAbount.setOnClickListener(this);
-        cvScan.setOnClickListener(this);
-        cvSetting.setOnClickListener(this);
-        cvUpdate.setOnClickListener(this);
-        cvHelp.setOnClickListener(this);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -269,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
                     String result = bundle.getString(CodeUtils.RESULT_STRING);
                     Log.d("MainActivity", result);
-                    getDataToWx(result);
+                    WeiXinShareUtil.shareDataToWx(result,MainActivity.this);
                 } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
                     String result = bundle.getString(CodeUtils.RESULT_STRING);
                     Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
@@ -278,104 +199,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void startZxing() {
-        Intent intent = new Intent(MainActivity.this, ZxingActivity.class);
-        startActivityForResult(intent,REQUEST_CODE);
-    }
-
-    public void getDataToWx(String id) {
-        if (dialog != null) {
-            dialog.show();
-            Log.d("MainActivity", "dialog");
-        }
-        String ids = SysUtils.getStringID(id);
-        BmobUtils.loadDataToBmob(ids)
-                .flatMap(new Function<DataWx, ObservableSource<DataWx>>() {
-                    @Override
-                    public ObservableSource<DataWx> apply(final DataWx wx) throws Exception {
-                        return io.reactivex.Observable.create(new ObservableOnSubscribe<DataWx>() {
-                            @Override
-                            public void subscribe(final ObservableEmitter<DataWx> emitter) throws Exception {
-                                ImageUtils.loadImageForGlide(wx.getImage())
-                                        .subscribe(new Consumer<List<String>>() {
-                                            @Override
-                                            public void accept(List<String> strings) throws Exception {
-                                                wx.setImage(strings);
-                                                emitter.onNext(wx);
-                                            }
-                                        });
-                            }
-                        });
-                    }
-                })
-                .doOnSubscribe(new Consumer<Disposable>() {
-                    @Override
-                    public void accept(Disposable disposable) throws Exception {
-
-                    }
-                })
-                .doOnTerminate(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        if (dialog.isShowing()) {
-                            dialog.dismiss();
-                        }
-                    }
-                })
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        if(dialog.isShowing())
-                            dialog.dismiss();
-                    }
-                })
-                .subscribe(new Consumer<DataWx>() {
-                    @Override
-                    public void accept(DataWx wx) throws Exception {
-
-                        WeiXinShareUtil.sharePhotosToWx(MainActivity.this,wx.getText(),wx.getImage());
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e("tt", "accept: ",throwable );
-                    }
-                });
-    }
 
 
 
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.cv_about:
-                AbountActivity.start(this);
-//                String s = "u49dfngkdj";
-//                String s1 = SysUtils.getStringToBase64(s);
-//                Log.d("MainActivity", s1);
-//                String s2 = SysUtils.getBase64ToString(s1);
-//                Log.d("MainActivity", s2);
 
-//                String s1 = SysUtils.getStringUrl(s);
-//                Log.d("MainActivity", s1);
-//                String s2 = SysUtils.getStringID(s1);
-//                Log.d("MainActivity", s2);
-
-                break;
-            case R.id.cv_help:
-                HelpActivity.start(this);
-                break;
-            case R.id.cv_scan:
-                startZxing();
-                break;
-            case R.id.cv_setting:
-                SettingActivity.start(this);
-                break;
-            case R.id.cv_update:
-                Intent intent = new Intent(MainActivity.this, UpdateActivity.class);
-                startActivity(intent);
-                break;
-        }
-    }
 }
