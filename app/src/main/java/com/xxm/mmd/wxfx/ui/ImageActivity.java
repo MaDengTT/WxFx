@@ -54,7 +54,7 @@ public class ImageActivity extends BaseActivity {
 
     private static final String TAG = "ImageActivity";
     private void initView() {
-
+        setTitleName("我的二维码");
         but_load = findViewById(R.id.but_load);
         but_share = findViewById(R.id.but_share);
 

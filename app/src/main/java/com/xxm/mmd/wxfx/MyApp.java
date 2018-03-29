@@ -3,9 +3,11 @@ package com.xxm.mmd.wxfx;
 import android.app.Application;
 
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
+import com.xxm.mmd.wxfx.bean.UserBean;
 
 import abc.abc.abc.AdManager;
 import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobUser;
 import cn.jiguang.analytics.android.api.JAnalyticsInterface;
 
 
@@ -31,4 +33,14 @@ public class MyApp extends Application {
         JAnalyticsInterface.init(this);
         JAnalyticsInterface.setDebugMode(true);
     }
+
+    public static MyApp getApp() {
+        return app;
+    }
+
+    public UserBean getUser() {
+        UserBean currentUser = BmobUser.getCurrentUser(UserBean.class);
+        return currentUser;
+    }
+
 }

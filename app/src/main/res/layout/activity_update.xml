@@ -3,7 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent">
+
+    <include layout="@layout/title_layout" />
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -35,12 +38,15 @@
         android:hint="分享有趣的事"
         android:inputType="textMultiLine"
         android:maxLength="140"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:paddingTop="10dp"
         android:textSize="14sp"/>
 </LinearLayout>
     <android.support.v7.widget.RecyclerView
+        android:paddingRight="16dp"
+        android:paddingLeft="16dp"
+        android:paddingBottom="16dp"
         android:background="@android:color/white"
         android:id="@+id/recycler"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -48,24 +54,65 @@
         app:layout_constraintTop_toBottomOf="@+id/ll_ed"
         android:layout_width="0dp"
         android:layout_height="wrap_content">
-
     </android.support.v7.widget.RecyclerView>
 
-    <Button
-        android:id="@+id/but_post"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
-        android:text="发送"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+    <RelativeLayout
+        android:background="@android:color/white"
         app:layout_constraintTop_toBottomOf="@+id/recycler"
+        android:layout_marginTop="16dp"
+        android:id="@+id/ll_to_square"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textSize="@dimen/text_title_size"
+            android:textColor="@color/primaryText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_centerVertical="true"
+            android:text="同步到广场"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-         />
+        <Switch
+            android:id="@+id/sw_to_square"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:background="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@+id/ll_to_square"
+        android:layout_marginTop="1px"
+        android:id="@+id/ll_to_team"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textSize="@dimen/text_title_size"
+            android:textColor="@color/primaryText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_centerVertical="true"
+            android:text="同步到我的团队"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Switch
+            android:id="@+id/sw_to_team"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            />
+    </RelativeLayout>
+
 
 </android.support.constraint.ConstraintLayout>
         </LinearLayout>

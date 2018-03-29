@@ -1,31 +1,36 @@
 package com.xxm.mmd.wxfx.ui.find;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.CircleAdapter;
-import com.xxm.mmd.wxfx.bean.CirlceBean;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.xxm.mmd.wxfx.ui.BaseFrament;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 
-public class FindFragment extends Fragment {
+public class FindFragment extends BaseFrament {
 
 
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
     Unbinder unbinder;
+    @BindView(R.id.viewPage)
+    ViewPager viewPage;
+    @BindView(R.id.tab_layout)
+    TabLayout tabLayout;
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
     private CircleAdapter adapter;
 
     public FindFragment() {
@@ -47,27 +52,13 @@ public class FindFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_find, container, false);
         unbinder = ButterKnife.bind(this, view);
         initView();
-        initData();
         return view;
     }
 
-    private void initData() {
-        List<CirlceBean> data = new ArrayList<>();
-        for(int i = 0;i<10;i++) {
-            data.add(new CirlceBean());
-        }
-
-        setData(data);
-    }
-
     private void initView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new CircleAdapter(null);
-        recyclerView.setAdapter(adapter);
-    }
-
-    private void setData(List<CirlceBean> data) {
-        adapter.setNewData(data);
+        setTitleName(tvTitle,"发现");
+        viewPage.setAdapter(new FindFragmentAdapter(getChildFragmentManager()));
+        tabLayout.setupWithViewPager(viewPage);
     }
 
 
@@ -75,5 +66,32 @@ public class FindFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+
     }
+
+    public class FindFragmentAdapter extends FragmentPagerAdapter {
+
+        public FindFragmentAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return position == 0 ? CircleFragment.newInstance(String.valueOf(position), "")
+                    : position == 1 ? CircleFragment.newInstance(String.valueOf(position), "")
+                    : CircleFragment.newInstance("", "");
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return position == 0 ? "信息广场" : position == 1 ? "我的团队" : "";
+        }
+    }
+
 }

@@ -12,6 +12,10 @@ public class DataWx extends BmobObject{
     String text;
     List<String> image;
 
+    UserBean user;  //用户
+    Boolean ifShowTeam;    //是否发布至团队
+    Boolean ifShowSquare;   //是否发布至广场
+
     @Override
     public String toString() {
         return "DataWx{" +

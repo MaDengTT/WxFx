@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xxm.mmd.wxfx.R;
@@ -26,6 +27,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    public void setTitleName(String s) {
+        TextView title = findViewById(R.id.tv_title);
+        if (title != null) {
+            title.setText(s);
+        }
     }
 
     @Override

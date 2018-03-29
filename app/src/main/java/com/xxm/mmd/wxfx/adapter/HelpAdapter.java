@@ -8,6 +8,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.bean.HelpBean;
+import com.xxm.mmd.wxfx.glide.GlideLoader;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class HelpAdapter extends BaseQuickAdapter<HelpBean,BaseViewHolder> {
     protected void convert(BaseViewHolder helper, HelpBean item) {
         helper.setText(R.id.tv_help, item.getTitle());
         ImageView view = (ImageView) helper.getView(R.id.iv_help_image);
-        Glide.with(mContext).load(item.getImageID()).into(view);
+        GlideLoader.loadNormal(view,item.getImageID());
         helper.setVisible(R.id.iv_help_image, item.isShwoImage);
     }
 }

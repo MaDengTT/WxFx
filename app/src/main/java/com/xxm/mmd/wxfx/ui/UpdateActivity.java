@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lzy.imagepicker.ImagePicker;
@@ -53,7 +54,7 @@ public class UpdateActivity extends BaseActivity {
 
     private EditText editText;
 
-    private Button button;
+    private TextView send;
 
     ProgressDialog dialog;
 
@@ -67,7 +68,8 @@ public class UpdateActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         dialog = new ProgressDialog(this);
         dialog.setTitle("请稍后");
@@ -150,10 +152,13 @@ public class UpdateActivity extends BaseActivity {
 
     private static final String TAG = "UpdateActivity";
     private void initView() {
+
+        setTitleName("发送朋友圈");
         editText = findViewById(R.id.et_content);
         recyclerView = findViewById(R.id.recycler);
-        button = findViewById(R.id.but_post);
-        button.setOnClickListener(new View.OnClickListener() {
+        send = findViewById(R.id.tv_send);
+        send.setVisibility(View.VISIBLE);
+        send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (getImageSize() == 9) {

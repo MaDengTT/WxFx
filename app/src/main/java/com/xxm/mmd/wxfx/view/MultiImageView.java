@@ -14,6 +14,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
+import com.xxm.mmd.wxfx.utils.GlideLoader;
 import com.xxm.mmd.wxfx.utils.SysUtils;
 
 import java.util.List;
@@ -208,7 +209,8 @@ public class MultiImageView extends LinearLayout {
             }
         });
         // TODO: 2016/10/18 之后设置网络图片
-        Glide.with(getContext()).load(url).into(imageView);
+//        Glide.with(getContext()).load(url).into(imageView);
+        com.xxm.mmd.wxfx.glide.GlideLoader.loadNormal(imageView,url);
         return imageView;
     }
 

@@ -8,13 +8,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.animation.GlideAnimation;
+
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.xxm.mmd.wxfx.MyApp;
+import com.xxm.mmd.wxfx.glide.GlideApp;
+import com.xxm.mmd.wxfx.glide.GlideLoader;
 
 
 import java.io.File;
@@ -63,27 +68,40 @@ public class ImageUtils {
     private static final String TAG = "ImageUtils";
 
     private static void GlideLoadImageForFile(final Context context, String url, final ObservableEmitter<String> emitter) {
-        Glide.with(context).load(url).asBitmap().toBytes().into(new SimpleTarget<byte[]>() {
+
+        GlideApp.with(context).asFile().load(url).into(new SimpleTarget<File>() {
             @Override
-            public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
-                try {
-                    //这里就不要用openFileOutput了,那个是往手机内存中写数据的
-                    String filePath = getFilePath();
-                    FileOutputStream output = new FileOutputStream(filePath);
-                    output.write(resource);
-                    //将bytes写入到输出流中
-                    output.close();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        String s = FileUtils.saveImageToGallery(context,new File(filePath));
-                        emitter.onNext(s);
-                    }else {
-                        emitter.onNext(filePath);
-                    }
-                } catch (Throwable throwable) {
-                    Log.e(TAG, "onResourceReady: ", throwable);
+            public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    String s = FileUtils.saveImageToGallery(context,resource);
+                    emitter.onNext(s);
+                }else {
+                    emitter.onNext(resource.getPath());
                 }
             }
         });
+
+//        Glide.with(context).load(url).asBitmap().toBytes().into(new SimpleTarget<byte[]>() {
+//            @Override
+//            public void onResourceReady(byte[] resource, GlideAnimation<? super byte[]> glideAnimation) {
+//                try {
+//                    //这里就不要用openFileOutput了,那个是往手机内存中写数据的
+//                    String filePath = getFilePath();
+//                    FileOutputStream output = new FileOutputStream(filePath);
+//                    output.write(resource);
+//                    //将bytes写入到输出流中
+//                    output.close();
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                        String s = FileUtils.saveImageToGallery(context,new File(filePath));
+//                        emitter.onNext(s);
+//                    }else {
+//                        emitter.onNext(filePath);
+//                    }
+//                } catch (Throwable throwable) {
+//                    Log.e(TAG, "onResourceReady: ", throwable);
+//                }
+//            }
+//        });
     }
 
     private static String getFilePath() throws IOException {

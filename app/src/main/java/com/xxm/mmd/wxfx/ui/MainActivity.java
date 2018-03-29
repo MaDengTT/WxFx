@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 
+import com.ashokvarma.bottomnavigation.TextBadgeItem;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 
 import com.xxm.mmd.wxfx.R;
@@ -81,11 +82,22 @@ public class MainActivity extends AppCompatActivity{
         bottomNavigationBar.setMode(BottomNavigationBar.MODE_FIXED)
                 .setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_STATIC);
 //        bottomNavigationBar.setBackgroundStyle(BottomNavigationBar.BACKGROUND_STYLE_RIPPLE);
+
+        BottomNavigationItem home = new BottomNavigationItem(R.drawable.ic_home_c, "主页")
+                .setInactiveIconResource(R.drawable.ic_home_un);
+        BottomNavigationItem function = new BottomNavigationItem(R.drawable.ic_function_c, "功能")
+                .setInactiveIconResource(R.drawable.ic_function_un);
+        BottomNavigationItem find = new BottomNavigationItem(R.drawable.ic_find_c, "发现")
+                .setInactiveIconResource(R.drawable.ic_find_un);
+        BottomNavigationItem my = new BottomNavigationItem(R.drawable.ic_my_c, "我的")
+                .setInactiveIconResource(R.drawable.ic_my_un);
+
+
         bottomNavigationBar
-                .addItem(new BottomNavigationItem(R.drawable.ic_about, "主页").setActiveColor(R.color.colorDefault))
-                .addItem(new BottomNavigationItem(R.drawable.ic_help,"功能").setActiveColor(R.color.colorDefault))
-                .addItem(new BottomNavigationItem(R.drawable.ic_launcher,"发现").setActiveColor(R.color.colorDefault))
-                .addItem(new BottomNavigationItem(R.drawable.ic_setting,"我的").setActiveColor(R.color.colorDefault))
+                .addItem(home)
+                .addItem(function)
+                .addItem(find)
+                .addItem(my)
                 .initialise();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment, homeFragment).show(homeFragment).commit();
         bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener() {

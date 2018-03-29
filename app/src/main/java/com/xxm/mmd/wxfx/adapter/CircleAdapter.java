@@ -29,7 +29,7 @@ public class CircleAdapter extends BaseQuickAdapter<CirlceBean,BaseViewHolder> {
             imageUrls = new ArrayList<>();
         }
         for(int i = 0;i<helper.getAdapterPosition();i++) {
-            imageUrls.add("http://bmob-cdn-17447.b0.upaiyun.com/2018/03/27/5f34db0b67f947eaa05922c8bb1a9e2d.jpg");
+            imageUrls.add("http://bmob-cdn-17447.b0.upaiyun.com/2018/03/29/6c2150a6e1d54b80902f45cf2f8e5092.jpg");
         }
         multiImage.setList(imageUrls);
     }

@@ -22,6 +22,7 @@ import com.xxm.mmd.wxfx.ui.AbountActivity;
 import com.xxm.mmd.wxfx.ui.HelpActivity;
 import com.xxm.mmd.wxfx.ui.LoginActivity;
 import com.xxm.mmd.wxfx.ui.SettingActivity;
+import com.xxm.mmd.wxfx.ui.ZxingActivity;
 import com.xxm.mmd.wxfx.view.RCRelativeLayout;
 
 import java.util.ArrayList;
@@ -94,6 +95,15 @@ public class MyFragment extends Fragment {
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+
+                if (position == 2) {
+
+                    Intent intent = new Intent(getActivity(), ZxingActivity.class);
+                    getActivity().startActivity(intent);
+
+                    return;
+                }
+
                 MenuBean bean = (MenuBean) adapter.getItem(position);
                 startActivtity(bean.getActivityClass());
             }

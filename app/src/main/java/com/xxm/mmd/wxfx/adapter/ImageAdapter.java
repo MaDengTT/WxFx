@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.xxm.mmd.wxfx.R;
+import com.xxm.mmd.wxfx.glide.GlideLoader;
 
 import java.util.List;
 
@@ -59,9 +60,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
         });
         String s = mDatas.get(position);
         if (TextUtils.equals("0000", s)) {
-            Glide.with(mContext).load(R.drawable.plus).into(holder.imageView);
+            GlideLoader.loadNormal(holder.imageView,R.drawable.plus);
         }else {
-            Glide.with(mContext).load(s).into(holder.imageView);
+            GlideLoader.loadNormal(holder.imageView,s);
         }
     }
 
