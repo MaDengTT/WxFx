@@ -1,15 +1,19 @@
 package com.xxm.mmd.wxfx.utils;
 
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.bean.BannerImage;
 import com.xxm.mmd.wxfx.bean.DataWx;
+import com.xxm.mmd.wxfx.bean.Team;
 import com.xxm.mmd.wxfx.bean.UpdateSys;
 import com.xxm.mmd.wxfx.bean.UserBean;
 
 
 import java.util.List;
 
+import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobSMS;
 import cn.bmob.v3.BmobUser;
@@ -19,10 +23,12 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.LogInListener;
 import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 import cn.bmob.v3.listener.UploadBatchListener;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.functions.Function;
 
 /**
@@ -31,7 +37,15 @@ import io.reactivex.functions.Function;
 
 public class BmobUtils {
 
-    public static Observable<String> PostData(final String text, List<String> strings) {
+    /**
+     * 上传数据
+     * @param text
+     * @param strings
+     * @param isShowSq
+     * @param isShowTeam
+     * @return
+     */
+    public static Observable<String> PostData(final String text, List<String> strings, final boolean isShowSq, final boolean isShowTeam) {
         String[] ss = new String[strings.size()];
         strings.toArray(ss);
         return uploadFiles(ss)
@@ -41,6 +55,12 @@ public class BmobUtils {
                         DataWx wx = new DataWx();
                         wx.setText(text);
                         wx.setImage(strings);
+                        wx.setIfShowSquare(isShowSq);
+                        wx.setIfShowTeam(isShowTeam);
+                        UserBean user = MyApp.getApp().getUser();
+                        if (user != null) {
+                            wx.setUser(user);
+                        }
                         return UpdateData(wx);
                     }
                 });
@@ -181,8 +201,139 @@ public class BmobUtils {
                 BmobUser.signOrLoginByMobilePhone(phoneNum, vCode, new LogInListener<UserBean>() {
                     @Override
                     public void done(UserBean userBean, BmobException e) {
-                        if (userBean != null) {
+                        if (userBean == null) {
                             emitter.onNext(userBean);
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<Team> getTeam(final String teamID) {
+        return Observable.create(new ObservableOnSubscribe<Team>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Team> emitter) throws Exception {
+                BmobQuery<Team> bmobQuery = new BmobQuery<>();
+                bmobQuery.getObject(teamID, new QueryListener<Team>() {
+                    @Override
+                    public void done(Team team, BmobException e) {
+                        if (e == null) {
+                            emitter.onNext(team);
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 获取朋友圈信息
+     * @param teamID
+     * @param pageSize
+     * @param pageNo
+     * @return
+     */
+    public static Observable<List<DataWx>> getDataWxs(final String teamID, final int pageSize, final int pageNo) {
+
+        if (TextUtils.isEmpty(teamID)) {
+            return Observable.create(new ObservableOnSubscribe<List<DataWx>>() {
+                @Override
+                public void subscribe(final ObservableEmitter<List<DataWx>> emitter) throws Exception {
+                    BmobQuery<DataWx> bmobQuery = new BmobQuery<>();
+                    bmobQuery.addWhereEqualTo("ifShowSquare", true);
+                    bmobQuery.include("user");
+                    bmobQuery.setLimit(pageSize).setSkip(pageNo)
+                            .findObjects(new FindListener<DataWx>() {
+                                @Override
+                                public void done(List<DataWx> list, BmobException e) {
+                                    if (e == null) {
+                                        emitter.onNext(list);
+                                        Log.d("BmobUtils", "list.size():" + list.size());
+                                    }else {
+                                        emitter.onError(e);
+                                    }
+                                }
+                            });
+                }
+            });
+
+        }else {
+           return getTeam(teamID)
+                    .flatMap(new Function<Team, ObservableSource<List<DataWx>>>() {
+                        @Override
+                        public ObservableSource<List<DataWx>> apply(final Team team) throws Exception {
+                            return  Observable.create(new ObservableOnSubscribe<List<DataWx>>() {
+                                @Override
+                                public void subscribe(final ObservableEmitter<List<DataWx>> emitter) throws Exception {
+                                    BmobQuery<DataWx> bmobQuery = new BmobQuery<>();
+                                    bmobQuery.addWhereEqualTo("ifShowSquare", true);
+                                    bmobQuery.addWhereEqualTo("team",team);
+                                    bmobQuery.setLimit(pageSize).setSkip(pageNo).findObjects(new FindListener<DataWx>() {
+                                        @Override
+                                        public void done(List<DataWx> list, BmobException e) {
+                                            if (e == null) {
+                                                emitter.onNext(list);
+                                            }else {
+                                                emitter.onError(e);
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+        }
+    }
+
+    /**
+     * 创建团队
+     * @param teamName
+     * @return
+     */
+    public static Observable<String> createTeamData(final String teamName) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                UserBean user = MyApp.getApp().getUser();
+                if (user == null) {
+                    emitter.onError(new Throwable("User IS NULL"));
+                }
+                Team team = new Team();
+                team.setAdminUser(user);
+                team.setName(teamName);
+                team.save(new SaveListener<String>() {
+                    @Override
+                    public void done(String s, BmobException e) {
+                        if (e == null) {
+                            emitter.onNext(s);
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+
+    public static Observable<String> addTotoTeam(final String teamId) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                UserBean user = MyApp.getApp().getUser();
+                Team team = new Team();
+                team.setObjectId(teamId);
+                user.setTeam(team);
+                user.update(new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e == null) {
+                            emitter.onNext("成功");
                         }else {
                             emitter.onError(e);
                         }

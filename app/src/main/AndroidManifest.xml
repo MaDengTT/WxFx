@@ -104,7 +104,12 @@
             android:name=".ui.ScrollingActivity"
             android:label="@string/title_activity_scrolling"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.LoginActivity"></activity>
+        <activity android:name=".ui.LoginActivity" />
+        <activity
+            android:name=".ui.TeamActivity"
+            android:label="@string/title_activity_team"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.CreateTeamActivity"></activity>
     </application>
 
 </manifest>

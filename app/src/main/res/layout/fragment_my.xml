@@ -116,6 +116,7 @@
 
 
                 <RelativeLayout
+                    android:id="@+id/rl_my_team"
                     android:layout_marginTop="8dp"
                     android:orientation="horizontal"
                     android:background="@color/white_Fa"
@@ -125,7 +126,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="我的服务"
+                        android:text="我的团队"
                         android:textSize="@dimen/text_context_size"
                         android:textColor="@color/primaryText"
                         android:layout_marginLeft="16dp"

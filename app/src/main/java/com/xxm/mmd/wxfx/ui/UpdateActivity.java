@@ -2,19 +2,14 @@ package com.xxm.mmd.wxfx.ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.media.MediaMetadata;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,22 +23,24 @@ import com.xxm.mmd.wxfx.adapter.ImageAdapter;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
 import com.xxm.mmd.wxfx.utils.GlideLoader;
 
-import org.w3c.dom.ls.LSException;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import abc.abc.abc.nm.bn.BannerManager;
 import abc.abc.abc.nm.sp.SpotListener;
 import abc.abc.abc.nm.sp.SpotManager;
-import io.reactivex.ObservableSource;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 public class UpdateActivity extends BaseActivity {
 
+    @BindView(R.id.sw_to_square)
+    Switch swToSquare;
+    @BindView(R.id.sw_to_team)
+    Switch swToTeam;
     private int IMAGE_PICKER = 0x55;
 
     private List<String> images;
@@ -57,6 +54,7 @@ public class UpdateActivity extends BaseActivity {
     private TextView send;
 
     ProgressDialog dialog;
+    private Unbinder bind;
 
     @Override
     protected int getLayoutId() {
@@ -70,6 +68,7 @@ public class UpdateActivity extends BaseActivity {
 
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        bind = ButterKnife.bind(this);
 
         dialog = new ProgressDialog(this);
         dialog.setTitle("请稍后");
@@ -83,13 +82,12 @@ public class UpdateActivity extends BaseActivity {
     }
 
 
-
     @Override
     public void onBackPressed() {
         if (SpotManager.getInstance(this).isSlideableSpotShowing()) {
             SpotManager.getInstance(this).hideSlideableSpot();
 //            return;
-        }else {
+        } else {
             super.onBackPressed();
         }
 
@@ -105,6 +103,7 @@ public class UpdateActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         SpotManager.getInstance(this).onDestroy();
+        bind.unbind();
 //        SpotManager.getInstance(this).onAppExit();
 //        BannerManager.getInstance(this).onDestroy();
     }
@@ -112,7 +111,7 @@ public class UpdateActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (dialog!=null&&dialog.isShowing()) {
+        if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
         SpotManager.getInstance(this).onPause();
@@ -151,6 +150,7 @@ public class UpdateActivity extends BaseActivity {
     }
 
     private static final String TAG = "UpdateActivity";
+
     private void initView() {
 
         setTitleName("发送朋友圈");
@@ -161,18 +161,19 @@ public class UpdateActivity extends BaseActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if (getImageSize() == 9) {
                     Toast.makeText(UpdateActivity.this, "请选择图片", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if(images.get(images.size() - 1).equals("0000")){
+                if (images.get(images.size() - 1).equals("0000")) {
                     images.remove(images.size() - 1);
                 }
                 if (dialog != null) {
                     dialog.show();
                 }
-                BmobUtils.PostData(editText.getText().toString(), images)
+                BmobUtils.PostData(editText.getText().toString(), images,swToSquare.isChecked(),swToTeam.isChecked())
                         .doOnSubscribe(new Consumer<Disposable>() {
                             @Override
                             public void accept(Disposable disposable) throws Exception {
@@ -184,22 +185,22 @@ public class UpdateActivity extends BaseActivity {
                         dialog.dismiss();
                     }
                 })
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) throws Exception {
-                        ImageActivity.start(UpdateActivity.this, s);
-                        finish();
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e(TAG, "accept: ",throwable );
-                    }
-                });
+                        .subscribe(new Consumer<String>() {
+                            @Override
+                            public void accept(String s) throws Exception {
+                                ImageActivity.start(UpdateActivity.this, s);
+                                finish();
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                Log.e(TAG, "accept: ", throwable);
+                            }
+                        });
             }
         });
 
-        recyclerView.setLayoutManager(new GridLayoutManager(this,4));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
 
         adapter = new ImageAdapter(images, this, new ImageAdapter.ItemOnClickListent() {
             @Override
@@ -215,7 +216,7 @@ public class UpdateActivity extends BaseActivity {
     }
 
     private void setDataToAdapter(List<String> datas) {
-        if(images.get(images.size() - 1).equals("0000")){
+        if (images.get(images.size() - 1).equals("0000")) {
             images.remove(images.size() - 1);
         }
         images.addAll(datas);
@@ -226,12 +227,11 @@ public class UpdateActivity extends BaseActivity {
     }
 
 
-
     private int getImageSize() {
 
-        if(images.get(images.size() - 1).equals("0000")){
-            return 9 - images.size()+1;
-        }else {
+        if (images.get(images.size() - 1).equals("0000")) {
+            return 9 - images.size() + 1;
+        } else {
             return 0;
         }
     }

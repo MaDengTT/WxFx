@@ -2,11 +2,13 @@ package com.xxm.mmd.wxfx.adapter;
 
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.bean.CirlceBean;
+import com.xxm.mmd.wxfx.glide.GlideLoader;
 import com.xxm.mmd.wxfx.view.MultiImageView;
 
 import java.util.ArrayList;
@@ -24,13 +26,16 @@ public class CircleAdapter extends BaseQuickAdapter<CirlceBean,BaseViewHolder> {
     protected void convert(BaseViewHolder helper, CirlceBean item) {
         MultiImageView multiImage = (MultiImageView)helper.getView(R.id.multiImage);
 
-        List<String> imageUrls = item.getImageUrls();
-        if (imageUrls == null) {
-            imageUrls = new ArrayList<>();
-        }
-        for(int i = 0;i<helper.getAdapterPosition();i++) {
-            imageUrls.add("http://bmob-cdn-17447.b0.upaiyun.com/2018/03/29/6c2150a6e1d54b80902f45cf2f8e5092.jpg");
-        }
-        multiImage.setList(imageUrls);
+        helper.setText(R.id.tv_user_name, item.getUserName()).setText(R.id.tv_content,item.getContent());
+        multiImage.setList(item.getImageUrls());
+        GlideLoader.loadAvatar((ImageView) helper.getView(R.id.iv_user_avatar),item.getAvatarUrl());
+//        List<String> imageUrls = item.getImageUrls();
+//        if (imageUrls == null) {
+//            imageUrls = new ArrayList<>();
+//        }
+//        for(int i = 0;i<helper.getAdapterPosition();i++) {
+//            imageUrls.add("http://bmob-cdn-17447.b0.upaiyun.com/2018/03/29/6c2150a6e1d54b80902f45cf2f8e5092.jpg");
+//        }
+//        multiImage.setList(imageUrls);
     }
 }

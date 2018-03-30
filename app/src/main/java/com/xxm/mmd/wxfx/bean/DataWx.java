@@ -16,6 +16,30 @@ public class DataWx extends BmobObject{
     Boolean ifShowTeam;    //是否发布至团队
     Boolean ifShowSquare;   //是否发布至广场
 
+    public Boolean getIfShowTeam() {
+        return ifShowTeam;
+    }
+
+    public void setIfShowTeam(Boolean ifShowTeam) {
+        this.ifShowTeam = ifShowTeam;
+    }
+
+    public Boolean getIfShowSquare() {
+        return ifShowSquare;
+    }
+
+    public void setIfShowSquare(Boolean ifShowSquare) {
+        this.ifShowSquare = ifShowSquare;
+    }
+
+    public UserBean getUser() {
+        return user;
+    }
+
+    public void setUser(UserBean user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "DataWx{" +

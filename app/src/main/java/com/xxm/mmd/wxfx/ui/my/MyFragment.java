@@ -54,6 +54,8 @@ public class MyFragment extends Fragment {
     @BindView(R.id.scrollView)
     ScrollView scrollView;
     Unbinder unbinder;
+    @BindView(R.id.rl_my_team)
+    RelativeLayout rlMyTeam;
     private MenuAdapter adapter;
 
     public MyFragment() {
@@ -123,13 +125,16 @@ public class MyFragment extends Fragment {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.iv_avatar, R.id.rc_avatar})
+    @OnClick({R.id.iv_avatar, R.id.rc_avatar,R.id.rl_my_team})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_avatar:
                 LoginActivity.start(getActivity());
                 break;
             case R.id.rc_avatar:
+                break;
+            case R.id.rl_my_team:
+
                 break;
         }
     }

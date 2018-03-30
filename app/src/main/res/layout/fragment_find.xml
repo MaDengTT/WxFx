@@ -2,12 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context="com.xxm.mmd.wxfx.ui.find.FindFragment">
 
     <include layout="@layout/title_layout" />
 
     <android.support.design.widget.TabLayout
+        app:tabBackground="@android:color/white"
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp" />

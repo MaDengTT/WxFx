@@ -10,6 +10,16 @@ public class UserBean extends BmobUser{
     String useravatar;
     Integer points;
 
+    Team team; //团队
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
     public String getUseravatar() {
         return useravatar;
     }

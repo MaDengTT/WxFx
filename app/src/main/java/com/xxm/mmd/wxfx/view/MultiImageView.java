@@ -59,9 +59,9 @@ public class MultiImageView extends LinearLayout {
     }
 
     public void setList(List<String> lists) throws IllegalArgumentException {
-        if (lists == null) {
-            throw new IllegalArgumentException("imageList is null...");
-        }
+//        if (lists == null) {
+//            throw new IllegalArgumentException("imageList is null...");
+//        }
         imagesList = lists;
 
         if (MAX_WIDTH > 0) {
