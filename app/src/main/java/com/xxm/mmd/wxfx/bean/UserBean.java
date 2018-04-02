@@ -12,6 +12,16 @@ public class UserBean extends BmobUser{
 
     Team team; //团队
 
+    Boolean postPerToTeam;
+
+    public Boolean getPostPerToTeam() {
+        return postPerToTeam;
+    }
+
+    public void setPostPerToTeam(Boolean postPerToTeam) {
+        this.postPerToTeam = postPerToTeam;
+    }
+
     public Team getTeam() {
         return team;
     }

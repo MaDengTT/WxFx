@@ -3,11 +3,15 @@ package com.xxm.mmd.wxfx;
 import android.app.Application;
 
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
+import com.xxm.mmd.wxfx.bean.Team;
 import com.xxm.mmd.wxfx.bean.UserBean;
+import com.xxm.mmd.wxfx.utils.BmobUtils;
 
 import abc.abc.abc.AdManager;
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.UpdateListener;
 import cn.jiguang.analytics.android.api.JAnalyticsInterface;
 
 
@@ -22,6 +26,7 @@ public class MyApp extends Application {
     public static String AD_APP_Id = "";
     public static String AD_POS_Id = "";
 
+    public Team team;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -43,4 +48,15 @@ public class MyApp extends Application {
         return currentUser;
     }
 
+    public void UpdateUser() {
+        getUser().update();
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
 }

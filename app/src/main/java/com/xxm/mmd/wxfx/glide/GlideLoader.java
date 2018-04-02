@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import android.support.v7.graphics.Palette;
+import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Priority;
@@ -72,6 +73,9 @@ public class GlideLoader {
      * @param url The url of image.
      */
     public static void loadNormal(ImageView imageView, String url) {
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
         if (url.endsWith(".gif")) {
             GlideApp.with(imageView.getContext())
                     .asGif()

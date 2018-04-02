@@ -9,6 +9,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.bean.CirlceBean;
 import com.xxm.mmd.wxfx.glide.GlideLoader;
+import com.xxm.mmd.wxfx.ui.BigImageActivity;
 import com.xxm.mmd.wxfx.view.MultiImageView;
 
 import java.util.ArrayList;
@@ -23,12 +24,23 @@ public class CircleAdapter extends BaseQuickAdapter<CirlceBean,BaseViewHolder> {
     }
 
     @Override
-    protected void convert(BaseViewHolder helper, CirlceBean item) {
+    protected void convert(BaseViewHolder helper, final CirlceBean item) {
         MultiImageView multiImage = (MultiImageView)helper.getView(R.id.multiImage);
 
         helper.setText(R.id.tv_user_name, item.getUserName()).setText(R.id.tv_content,item.getContent());
         multiImage.setList(item.getImageUrls());
         GlideLoader.loadAvatar((ImageView) helper.getView(R.id.iv_user_avatar),item.getAvatarUrl());
+        helper.addOnClickListener(R.id.tv_share);
+
+        multiImage.setOnItemClickListener(new MultiImageView.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                String[] s = new String[item.getImageUrls().size()];
+                item.getImageUrls().toArray(s);
+                BigImageActivity.start(mContext,s,position);
+            }
+        });
+
 //        List<String> imageUrls = item.getImageUrls();
 //        if (imageUrls == null) {
 //            imageUrls = new ArrayList<>();

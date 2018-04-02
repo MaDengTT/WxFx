@@ -109,7 +109,8 @@
             android:name=".ui.TeamActivity"
             android:label="@string/title_activity_team"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.CreateTeamActivity"></activity>
+        <activity android:name=".ui.CreateTeamActivity" />
+        <activity android:name=".ui.BigImageActivity"></activity>
     </application>
 
 </manifest>

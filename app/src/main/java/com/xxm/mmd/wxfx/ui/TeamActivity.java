@@ -1,20 +1,62 @@
 package com.xxm.mmd.wxfx.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.xxm.mmd.wxfx.R;
+import com.xxm.mmd.wxfx.adapter.TeamAdapter;
+import com.xxm.mmd.wxfx.bean.Team;
+import com.xxm.mmd.wxfx.bean.UserBean;
+import com.xxm.mmd.wxfx.utils.BmobUtils;
 
-public class TeamActivity extends AppCompatActivity {
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import io.reactivex.functions.Consumer;
+
+public class TeamActivity extends BaseActivity {
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.tv_send)
+    TextView tvSend;
+    @BindView(R.id.recycler)
+    RecyclerView recycler;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+    private TeamAdapter teamAdapter;
+
+    Team team;
+
+    int pageSize = 10;
+    int pageNo = 0;
+
+    public static void start(Context context, Team team) {
+        Intent starter = new Intent(context, TeamActivity.class);
+        starter.putExtra("teamId", team);
+        context.startActivity(starter);
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_team;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_team);
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -26,6 +68,35 @@ public class TeamActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        team = (Team) getIntent().getSerializableExtra("teamId");
+        initView();
+        initData();
     }
 
+    private static final String TAG = "TeamActivity";
+    private void initData() {
+        BmobUtils.findTeamUsers(team,pageSize,pageNo)
+                .subscribe(new Consumer<List<UserBean>>() {
+                    @Override
+                    public void accept(List<UserBean> userBeans) throws Exception {
+                        setData(userBeans);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e(TAG, "accept: ",throwable );
+                    }
+                });
+    }
+
+    private void initView() {
+        recycler.setLayoutManager(new LinearLayoutManager(this));
+        teamAdapter = new TeamAdapter(null);
+        recycler.setAdapter(teamAdapter);
+
+    }
+
+    public void setData(List<UserBean> data) {
+        teamAdapter.setNewData(data);
+    }
 }

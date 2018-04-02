@@ -1,5 +1,6 @@
 package com.xxm.mmd.wxfx.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,12 +14,14 @@ import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.xxm.mmd.wxfx.bean.CirlceBean;
 import com.xxm.mmd.wxfx.bean.DataWx;
 import com.xxm.mmd.wxfx.ui.MainActivity;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -138,6 +141,7 @@ public class WeiXinShareUtil {
         context.startActivity(Intent.createChooser(shareIntent, "分享到"));
     }
 
+    @SuppressLint("CheckResult")
     public static void shareDataToWx(String id, final Activity activity) {
         String ids = SysUtils.getStringID(id);
         BmobUtils.loadDataToBmob(ids)
@@ -148,6 +152,41 @@ public class WeiXinShareUtil {
                             @Override
                             public void subscribe(final ObservableEmitter<DataWx> emitter) throws Exception {
                                 ImageUtils.loadImageForGlide(wx.getImage())
+                                        .subscribe(new Consumer<List<String>>() {
+                                            @Override
+                                            public void accept(List<String> strings) throws Exception {
+                                                wx.setImage(strings);
+                                                emitter.onNext(wx);
+                                            }
+                                        });
+                            }
+                        });
+                    }
+                })
+                .subscribe(new Consumer<DataWx>() {
+                    @Override
+                    public void accept(DataWx wx) throws Exception {
+                        sharePhotosToWx(activity,wx.getText(),wx.getImage());
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e("tt", "accept: ",throwable );
+                    }
+                });
+    }
+    public static void shareDataToWx(CirlceBean bean, final Activity activity) {
+        io.reactivex.Observable.just(bean)
+                .flatMap(new Function<CirlceBean, ObservableSource<DataWx>>() {
+                    @Override
+                    public ObservableSource<DataWx> apply(final CirlceBean bean) throws Exception {
+
+                        return io.reactivex.Observable.create(new ObservableOnSubscribe<DataWx>() {
+                            @Override
+                            public void subscribe(final ObservableEmitter<DataWx> emitter) throws Exception {
+                                final DataWx wx = new DataWx();
+                                wx.setText(bean.getContent());
+                                ImageUtils.loadImageForGlide(bean.getImageUrls())
                                         .subscribe(new Consumer<List<String>>() {
                                             @Override
                                             public void accept(List<String> strings) throws Exception {

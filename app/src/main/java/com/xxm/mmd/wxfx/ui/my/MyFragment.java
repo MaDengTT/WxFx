@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +16,20 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.MenuAdapter;
 import com.xxm.mmd.wxfx.bean.MenuBean;
+import com.xxm.mmd.wxfx.bean.Team;
+import com.xxm.mmd.wxfx.bean.UserBean;
+import com.xxm.mmd.wxfx.glide.GlideLoader;
 import com.xxm.mmd.wxfx.ui.AbountActivity;
 import com.xxm.mmd.wxfx.ui.HelpActivity;
 import com.xxm.mmd.wxfx.ui.LoginActivity;
 import com.xxm.mmd.wxfx.ui.SettingActivity;
+import com.xxm.mmd.wxfx.ui.TeamActivity;
 import com.xxm.mmd.wxfx.ui.ZxingActivity;
+import com.xxm.mmd.wxfx.utils.BmobUtils;
 import com.xxm.mmd.wxfx.view.RCRelativeLayout;
 
 import java.util.ArrayList;
@@ -32,6 +39,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import cn.bmob.v3.BmobQuery;
+import io.reactivex.functions.Consumer;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -77,10 +86,36 @@ public class MyFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         initView();
+        initUserInfo();
         initData();
         return view;
     }
 
+    private void initUserInfo() {
+//        MyApp.getApp().UpdateUser();
+        BmobQuery<UserBean> query = new BmobQuery<>();
+        query.include("team");
+
+        UserBean user = MyApp.getApp().getUser();
+        if (user != null) {
+            tvUserName.setText(user.getUsername());
+            GlideLoader.loadAvatar(ivAvatar,user.getUseravatar());
+        }
+        BmobUtils.findCurrentUserTeam(false).subscribe(new Consumer<Team>() {
+            @Override
+            public void accept(Team team) throws Exception {
+                Log.d("MyFragment", team.getName());
+            }
+        }, new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                Log.e(TAG, "accept: ",throwable );
+            }
+        });
+
+    }
+
+    private static final String TAG = "MyFragment";
     private void initData() {
         List<MenuBean> data = new ArrayList<>();
         data.add(new MenuBean("设置", SettingActivity.class));
@@ -98,13 +133,13 @@ public class MyFragment extends Fragment {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
 
-                if (position == 2) {
-
-                    Intent intent = new Intent(getActivity(), ZxingActivity.class);
-                    getActivity().startActivity(intent);
-
-                    return;
-                }
+//                if (position == 2) {
+//
+//                    Intent intent = new Intent(getActivity(), ZxingActivity.class);
+//                    getActivity().startActivity(intent);
+//
+//                    return;
+//                }
 
                 MenuBean bean = (MenuBean) adapter.getItem(position);
                 startActivtity(bean.getActivityClass());
@@ -134,7 +169,18 @@ public class MyFragment extends Fragment {
             case R.id.rc_avatar:
                 break;
             case R.id.rl_my_team:
-
+                BmobUtils.findCurrentUserTeam(false)
+                        .subscribe(new Consumer<Team>() {
+                            @Override
+                            public void accept(Team team) throws Exception {
+                                TeamActivity.start(getActivity(),team);
+                            }
+                        }, new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable throwable) throws Exception {
+                                Log.e(TAG, "accept: ",throwable );
+                            }
+                        });
                 break;
         }
     }

@@ -9,6 +9,7 @@ import com.xxm.mmd.wxfx.bean.DataWx;
 import com.xxm.mmd.wxfx.bean.Team;
 import com.xxm.mmd.wxfx.bean.UpdateSys;
 import com.xxm.mmd.wxfx.bean.UserBean;
+import com.xxm.mmd.wxfx.ui.UpdateActivity;
 
 
 import java.util.List;
@@ -18,6 +19,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobSMS;
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.LogInListener;
@@ -51,17 +53,30 @@ public class BmobUtils {
         return uploadFiles(ss)
                 .flatMap(new Function<List<String>, Observable<String>>() {
                     @Override
-                    public Observable<String> apply(List<String> strings) throws Exception {
-                        DataWx wx = new DataWx();
-                        wx.setText(text);
-                        wx.setImage(strings);
-                        wx.setIfShowSquare(isShowSq);
-                        wx.setIfShowTeam(isShowTeam);
-                        UserBean user = MyApp.getApp().getUser();
-                        if (user != null) {
-                            wx.setUser(user);
-                        }
-                        return UpdateData(wx);
+                    public Observable<String> apply(final List<String> strings) throws Exception {
+
+
+                        return findCurrentUserTeam(false).flatMap(new Function<Team, ObservableSource<String>>() {
+                            @Override
+                            public ObservableSource<String> apply(Team team) throws Exception {
+                                DataWx wx = new DataWx();
+                                wx.setText(text);
+                                wx.setImage(strings);
+                                wx.setIfShowSquare(isShowSq);
+                                wx.setIfShowTeam(isShowTeam);
+
+                                if (isShowTeam) {
+                                    wx.setTeam(MyApp.getApp().getTeam());
+                                    Log.d("BmobUtils", MyApp.getApp().getTeam().getName());
+                                }
+                                UserBean user = MyApp.getApp().getUser();
+                                if (user != null) {
+                                    wx.setUser(user);
+                                }
+                                return  UpdateData(wx);
+                            }
+                        });
+
                     }
                 });
     }
@@ -239,7 +254,7 @@ public class BmobUtils {
      * @return
      */
     public static Observable<List<DataWx>> getDataWxs(final String teamID, final int pageSize, final int pageNo) {
-
+        Log.d("BmobUtils", "pageNo:" + pageNo);
         if (TextUtils.isEmpty(teamID)) {
             return Observable.create(new ObservableOnSubscribe<List<DataWx>>() {
                 @Override
@@ -247,7 +262,8 @@ public class BmobUtils {
                     BmobQuery<DataWx> bmobQuery = new BmobQuery<>();
                     bmobQuery.addWhereEqualTo("ifShowSquare", true);
                     bmobQuery.include("user");
-                    bmobQuery.setLimit(pageSize).setSkip(pageNo)
+                    bmobQuery.order("-createdAt");
+                    bmobQuery.setLimit(pageSize).setSkip(pageNo*pageSize)
                             .findObjects(new FindListener<DataWx>() {
                                 @Override
                                 public void done(List<DataWx> list, BmobException e) {
@@ -263,30 +279,32 @@ public class BmobUtils {
             });
 
         }else {
-           return getTeam(teamID)
-                    .flatMap(new Function<Team, ObservableSource<List<DataWx>>>() {
-                        @Override
-                        public ObservableSource<List<DataWx>> apply(final Team team) throws Exception {
-                            return  Observable.create(new ObservableOnSubscribe<List<DataWx>>() {
+            Log.d("BmobUtils", teamID);
+            return  Observable.create(new ObservableOnSubscribe<List<DataWx>>() {
+                @Override
+                public void subscribe(final ObservableEmitter<List<DataWx>> emitter) throws Exception {
+                    BmobQuery<DataWx> bmobQuery = new BmobQuery<>();
+                    bmobQuery.addWhereEqualTo("ifShowTeam", true);
+                    bmobQuery.include("user");
+                    Team team = new Team();
+                    team.setObjectId(teamID);
+                    bmobQuery.addWhereEqualTo("team",new BmobPointer(team));
+                    bmobQuery.order("-createdAt");
+                    bmobQuery.setLimit(pageSize).setSkip(pageNo*pageSize)
+                            .findObjects(new FindListener<DataWx>() {
                                 @Override
-                                public void subscribe(final ObservableEmitter<List<DataWx>> emitter) throws Exception {
-                                    BmobQuery<DataWx> bmobQuery = new BmobQuery<>();
-                                    bmobQuery.addWhereEqualTo("ifShowSquare", true);
-                                    bmobQuery.addWhereEqualTo("team",team);
-                                    bmobQuery.setLimit(pageSize).setSkip(pageNo).findObjects(new FindListener<DataWx>() {
-                                        @Override
-                                        public void done(List<DataWx> list, BmobException e) {
-                                            if (e == null) {
-                                                emitter.onNext(list);
-                                            }else {
-                                                emitter.onError(e);
-                                            }
-                                        }
-                                    });
+                                public void done(List<DataWx> list, BmobException e) {
+                                    if (e == null) {
+                                        emitter.onNext(list);
+                                        Log.d("BmobUtils", "list.size():" + list.size());
+                                    }else {
+                                        emitter.onError(e);
+                                    }
                                 }
                             });
-                        }
-                    });
+                }
+            });
+
         }
     }
 
@@ -339,6 +357,63 @@ public class BmobUtils {
                         }
                     }
                 });
+            }
+        });
+    }
+
+    /**
+     * 获取当前用户团队
+     * @return
+     */
+    public static Observable<Team> findCurrentUserTeam(final boolean ifNetWorlk) {
+        return Observable.create(new ObservableOnSubscribe<Team>() {
+            @Override
+            public void subscribe(final ObservableEmitter<Team> emitter) throws Exception {
+
+                if (!ifNetWorlk&&MyApp.getApp().getTeam() != null) {
+                    emitter.onNext(MyApp.getApp().getTeam());
+                }else {
+                    UserBean userBean = MyApp.getApp().getUser();
+                    BmobQuery<UserBean> teamQ = new BmobQuery<>();
+//                teamQ.setCachePolicy(BmobQuery.CachePolicy.CACHE_ELSE_NETWORK);
+                    teamQ.include("team");
+                    teamQ.getObject(userBean.getObjectId(), new QueryListener<UserBean>() {
+                        @Override
+                        public void done(UserBean userBean, BmobException e) {
+                            if (e == null) {
+                                MyApp.getApp().setTeam(userBean.getTeam());
+                                emitter.onNext(userBean.getTeam());
+                            }else {
+                                emitter.onError(e);
+                            }
+                        }
+                    });
+                }
+
+            }
+        });
+    }
+
+    public static Observable<List<UserBean>> findTeamUsers(final Team team, final int pageSize, final int pageNo) {
+        return Observable.create(new ObservableOnSubscribe<List<UserBean>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<List<UserBean>> emitter) throws Exception {
+                BmobQuery<UserBean> bmobQuery = new BmobQuery<>();
+                bmobQuery.addWhereEqualTo("team", new BmobPointer(team));
+                bmobQuery.addQueryKeys("objectId,username,useravatar,postPerToTeam");
+                bmobQuery.setLimit(pageSize).setSkip(pageNo*pageSize)
+                        .findObjects(new FindListener<UserBean>() {
+                            @Override
+                            public void done(List<UserBean> list, BmobException e) {
+                                if (e == null) {
+                                    emitter.onNext(list);
+//                                    Log.d("BmobUtils", "list.size():" + list.size());
+//                                    Log.d("BmobUtils", list.get(0).getUsername());
+                                }else {
+                                    emitter.onError(e);
+                                }
+                            }
+                        });
             }
         });
     }

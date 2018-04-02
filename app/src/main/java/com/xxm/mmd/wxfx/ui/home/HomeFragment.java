@@ -6,19 +6,24 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.CircleAdapter;
 import com.xxm.mmd.wxfx.bean.CirlceBean;
+import com.xxm.mmd.wxfx.bean.DataWx;
 import com.xxm.mmd.wxfx.glide.BannerGlideLoader;
 import com.xxm.mmd.wxfx.ui.BaseFrament;
 import com.xxm.mmd.wxfx.ui.MainActivity;
 import com.xxm.mmd.wxfx.ui.UpdateActivity;
 import com.xxm.mmd.wxfx.ui.ZxingActivity;
+import com.xxm.mmd.wxfx.utils.BmobUtils;
+import com.xxm.mmd.wxfx.utils.WeiXinShareUtil;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
@@ -29,6 +34,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 
 public class HomeFragment extends BaseFrament implements View.OnClickListener {
@@ -83,14 +92,42 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
 
     private void initData() {
 
-        List<CirlceBean> data = new ArrayList<>();
-        for(int i = 0;i<10;i++) {
-            data.add(new CirlceBean());
-        }
+        BmobUtils.getDataWxs("",10,0)
+                .flatMap(new Function<List<DataWx>, ObservableSource<List<CirlceBean>>>() {
+                    @Override
+                    public ObservableSource<List<CirlceBean>> apply(List<DataWx> dataWxes) throws Exception {
+                        List<CirlceBean> cirlceBeanList = new ArrayList<>();
+                        for (int i = 0; i < dataWxes.size(); i++) {
+                            DataWx dataWx = dataWxes.get(i);
+                            CirlceBean bean = new CirlceBean();
+                            bean.setContent(dataWx.getText());
+                            bean.setImageUrls(dataWx.getImage());
+                            if (dataWx.getUser() != null) {
+                                bean.setAvatarUrl(dataWx.getUser().getUseravatar());
+                                bean.setUserName(dataWx.getUser().getUsername());
+//                                Log.d(TAG, dataWx.getUser().getMobilePhoneNumber() + "");
+                            }
+                            cirlceBeanList.add(bean);
+                        }
+                        return Observable.just(cirlceBeanList);
+                    }
+                })
+                .subscribe(new Consumer<List<CirlceBean>>() {
+                    @Override
+                    public void accept(List<CirlceBean> cirlceBeans) throws Exception {
+                        setData(cirlceBeans);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Log.e(TAG, "accept: ",throwable );
+                    }
+                });
 
-        setData(data);
 
     }
+
+    private static final String TAG = "HomeFragment";
     private void setData(List<CirlceBean> data) {
         adapter.setNewData(data);
     }
@@ -156,11 +193,23 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
 
         cvScan.setOnClickListener(this);
         cvUpdate.setOnClickListener(this);
+
+        adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
+                switch (view.getId()) {
+                    case R.id.tv_share:
+                        CirlceBean item = (CirlceBean) adapter.getItem(position);
+                        WeiXinShareUtil.shareDataToWx(item,getActivity());
+                        break;
+                }
+            }
+        });
     }
 
     public void startZxing() {
         Intent intent = new Intent(getActivity(), ZxingActivity.class);
-        startActivityForResult(intent, MainActivity.REQUEST_CODE);
+        getActivity().startActivityForResult(intent, MainActivity.REQUEST_CODE);
     }
 
 

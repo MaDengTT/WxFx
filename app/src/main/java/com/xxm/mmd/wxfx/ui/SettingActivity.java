@@ -1,22 +1,18 @@
 package com.xxm.mmd.wxfx.ui;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
-import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
-import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -30,19 +26,20 @@ import com.xxm.mmd.wxfx.utils.UpdateManager;
 import com.xxm.mmd.wxfx.utils.WeiXinShareUtil;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Observable;
 
+import butterknife.OnClick;
+import cn.bmob.v3.BmobUser;
+import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
-public class SettingActivity extends BaseActivity implements AccessibilityManager.AccessibilityStateChangeListener{
+public class SettingActivity extends BaseActivity implements AccessibilityManager.AccessibilityStateChangeListener {
 
     private static final String TAG = "SettingActivity";
+
     public static void start(Context context) {
         Intent starter = new Intent(context, SettingActivity.class);
         context.startActivity(starter);
@@ -70,7 +67,7 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
                             public void accept(UpdateSys updateSys) throws Exception {
                                 if (updateSys != null) {
                                     Log.d(TAG, updateSys.toString());
-                                    if(SysUtils.getVersionCode(getBaseContext()) == Integer.valueOf(updateSys.getVesion()))
+                                    if (SysUtils.getVersionCode(getBaseContext()) == Integer.valueOf(updateSys.getVesion()))
                                         Toast.makeText(SettingActivity.this, "您的应用不需要跟新", Toast.LENGTH_SHORT).show();
                                     else
                                         update(updateSys);
@@ -93,10 +90,10 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
             public void onClick(View v) {
 //                Log.d(TAG, "is : " + isServiceEnabled());
 //                if (!isServiceEnabled()) {
-                if(!serviceIsRunning(".service.MyService")){
+                if (!serviceIsRunning(".service.MyService")) {
 //                    aSwitch.set
                     startAccessibilityService();
-                }else {
+                } else {
                     stopAccessibilityService();
                 }
             }
@@ -105,7 +102,7 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
         findViewById(R.id.ll_clera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                io.reactivex.Observable.just(1)
+                Observable.just(1)
                         .subscribe(new Consumer<Integer>() {
                             @Override
                             public void accept(Integer integer) throws Exception {
@@ -118,7 +115,7 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
                         }, new Consumer<Throwable>() {
                             @Override
                             public void accept(Throwable throwable) throws Exception {
-                                Log.e(TAG, "accept: ",throwable );
+                                Log.e(TAG, "accept: ", throwable);
                             }
                         });
 
@@ -171,7 +168,7 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
         super.onResume();
         if (serviceIsRunning(".service.MyService")) {
             aSwitch.setChecked(true);
-        }else {
+        } else {
             aSwitch.setChecked(false);
         }
     }
@@ -265,7 +262,9 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
                         startActivity(intent);
                     }
                 }).create().show();
-    }    /**
+    }
+
+    /**
      * 前往设置界面开启服务
      */
     private void stopAccessibilityService() {
@@ -288,8 +287,13 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
     public void onAccessibilityStateChanged(boolean enabled) {
         if (serviceIsRunning(".service.MyService")) {
             aSwitch.setChecked(true);
-        }else {
+        } else {
             aSwitch.setChecked(false);
         }
+    }
+
+    @OnClick(R.id.loginout)
+    public void onViewClicked() {
+        BmobUser.logOut();
     }
 }

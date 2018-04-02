@@ -16,6 +16,16 @@ public class DataWx extends BmobObject{
     Boolean ifShowTeam;    //是否发布至团队
     Boolean ifShowSquare;   //是否发布至广场
 
+    Team team;
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
     public Boolean getIfShowTeam() {
         return ifShowTeam;
     }

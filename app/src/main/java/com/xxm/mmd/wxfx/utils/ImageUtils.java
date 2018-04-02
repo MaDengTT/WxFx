@@ -14,12 +14,14 @@ import android.util.Log;
 
 import com.bumptech.glide.Glide;
 
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.glide.GlideApp;
 import com.xxm.mmd.wxfx.glide.GlideLoader;
+import com.xxm.mmd.wxfx.glide.GlideRequest;
 
 
 import java.io.File;
@@ -69,7 +71,7 @@ public class ImageUtils {
 
     private static void GlideLoadImageForFile(final Context context, String url, final ObservableEmitter<String> emitter) {
 
-        GlideApp.with(context).asFile().load(url).into(new SimpleTarget<File>() {
+        GlideApp.with(context).download(url).into(new SimpleTarget<File>() {
             @Override
             public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -80,6 +82,12 @@ public class ImageUtils {
                 }
             }
         });
+//        GlideApp.with(context).asFile().load(url).into(new SimpleTarget<File>() {
+//            @Override
+//            public void onResourceReady(@NonNull File resource, @Nullable Transition<? super File> transition) {
+//
+//            }
+//        });
 
 //        Glide.with(context).load(url).asBitmap().toBytes().into(new SimpleTarget<byte[]>() {
 //            @Override
