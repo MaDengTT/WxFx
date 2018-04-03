@@ -19,6 +19,17 @@ import java.util.List;
  * Created by MaDeng on 2018/3/28.
  */
 public class CircleAdapter extends BaseQuickAdapter<CirlceBean,BaseViewHolder> {
+
+    boolean ifDel = false;
+
+    public boolean isIfDel() {
+        return ifDel;
+    }
+
+    public void setIfDel(boolean ifDel) {
+        this.ifDel = ifDel;
+    }
+
     public CircleAdapter(@Nullable List<CirlceBean> data) {
         super(R.layout.item_circle,data);
     }
@@ -30,7 +41,10 @@ public class CircleAdapter extends BaseQuickAdapter<CirlceBean,BaseViewHolder> {
         helper.setText(R.id.tv_user_name, item.getUserName()).setText(R.id.tv_content,item.getContent());
         multiImage.setList(item.getImageUrls());
         GlideLoader.loadAvatar((ImageView) helper.getView(R.id.iv_user_avatar),item.getAvatarUrl());
-        helper.addOnClickListener(R.id.tv_share);
+        helper.addOnClickListener(R.id.tv_share)
+                .addOnClickListener(R.id.tv_del)
+                .setVisible(R.id.tv_del, ifDel)
+        .setText(R.id.tv_time,item.getTime());
 
         multiImage.setOnItemClickListener(new MultiImageView.OnItemClickListener() {
             @Override

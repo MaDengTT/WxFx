@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.xxm.mmd.wxfx.MyApp;
@@ -26,6 +27,7 @@ import com.xxm.mmd.wxfx.glide.GlideLoader;
 import com.xxm.mmd.wxfx.ui.AbountActivity;
 import com.xxm.mmd.wxfx.ui.HelpActivity;
 import com.xxm.mmd.wxfx.ui.LoginActivity;
+import com.xxm.mmd.wxfx.ui.MyCircleActivity;
 import com.xxm.mmd.wxfx.ui.SettingActivity;
 import com.xxm.mmd.wxfx.ui.TeamActivity;
 import com.xxm.mmd.wxfx.ui.ZxingActivity;
@@ -118,6 +120,7 @@ public class MyFragment extends Fragment {
     private static final String TAG = "MyFragment";
     private void initData() {
         List<MenuBean> data = new ArrayList<>();
+        data.add(new MenuBean("我的发布", MyCircleActivity.class));
         data.add(new MenuBean("设置", SettingActivity.class));
         data.add(new MenuBean("帮助", HelpActivity.class));
         data.add(new MenuBean("关于", AbountActivity.class));
@@ -147,7 +150,7 @@ public class MyFragment extends Fragment {
         });
     }
 
-    private void startActivtity(Class<?> c) {
+    public void startActivtity(Class<?> c) {
         if (c != null) {
             Intent intent = new Intent(getActivity(), c);
             startActivity(intent);
@@ -179,6 +182,7 @@ public class MyFragment extends Fragment {
                             @Override
                             public void accept(Throwable throwable) throws Exception {
                                 Log.e(TAG, "accept: ",throwable );
+                                Toast.makeText(getActivity(), "没有团队", Toast.LENGTH_SHORT).show();
                             }
                         });
                 break;

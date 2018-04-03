@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +30,10 @@ public class LoginActivity extends AppCompatActivity {
     TextView tvButVCode;
     @BindView(R.id.tv_but_login)
     TextView tvButLogin;
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.tv_send)
+    TextView tvSend;
 
     public static void start(Context context) {
         Intent starter = new Intent(context, LoginActivity.class);
@@ -43,9 +46,18 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+        tvSend.setText("注册");
+        tvSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                RegisterActivity.start(LoginActivity.this);
+            }
+        });
+        tvSend.setVisibility(View.VISIBLE);
     }
 
     private static final String TAG = "LoginActivity";
+
     @OnClick({R.id.tv_but_vCode, R.id.tv_but_login})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -66,10 +78,10 @@ public class LoginActivity extends AppCompatActivity {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
-                        Log.e(TAG, "accept: ",throwable );
+                        Log.e(TAG, "accept: ", throwable);
                     }
                 });
-                
+
                 break;
             case R.id.tv_but_login:
                 BmobUtils.signOrLoginByMobilePhone(tvPhone.getText().toString(), tvVCode.getText().toString())

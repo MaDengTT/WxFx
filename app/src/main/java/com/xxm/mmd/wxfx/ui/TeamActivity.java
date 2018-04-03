@@ -12,7 +12,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.TeamAdapter;
 import com.xxm.mmd.wxfx.bean.Team;
@@ -94,6 +96,30 @@ public class TeamActivity extends BaseActivity {
         teamAdapter = new TeamAdapter(null);
         recycler.setAdapter(teamAdapter);
 
+        teamAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
+            @Override
+            public void onItemChildClick(final BaseQuickAdapter adapter, View view, final int position) {
+                switch (view.getId()) {
+                    case R.id.tv_del:
+                        UserBean item = teamAdapter.getItem(position);
+                        BmobUtils.removeUserToTeam(item.getObjectId())
+                                .subscribe(new Consumer<String>() {
+                                    @Override
+                                    public void accept(String s) throws Exception {
+                                        Toast.makeText(TeamActivity.this, s, Toast.LENGTH_SHORT).show();
+                                        adapter.remove(position);
+                                    }
+                                }, new Consumer<Throwable>() {
+                                    @Override
+                                    public void accept(Throwable throwable) throws Exception {
+                                        Log.e(TAG, "accept: ",throwable );
+                                        Toast.makeText(TeamActivity.this, "删除失败", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                        break;
+                }
+            }
+        });
     }
 
     public void setData(List<UserBean> data) {

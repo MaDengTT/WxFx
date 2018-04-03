@@ -213,7 +213,16 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-
+    public void startActivtity(Class<?> c) {
+        if (c != null) {
+            Intent intent = new Intent(this, c);
+            startActivity(intent);
+        }
+    }
+    public void startZxing() {
+        Intent intent = new Intent(this, ZxingActivity.class);
+        this.startActivityForResult(intent, MainActivity.REQUEST_CODE);
+    }
 
 
 }

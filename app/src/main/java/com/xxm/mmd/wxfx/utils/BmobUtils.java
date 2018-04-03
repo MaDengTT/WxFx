@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.bean.BannerImage;
+import com.xxm.mmd.wxfx.bean.CirlceBean;
 import com.xxm.mmd.wxfx.bean.DataWx;
 import com.xxm.mmd.wxfx.bean.Team;
 import com.xxm.mmd.wxfx.bean.UpdateSys;
@@ -12,6 +13,7 @@ import com.xxm.mmd.wxfx.bean.UserBean;
 import com.xxm.mmd.wxfx.ui.UpdateActivity;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.BmobObject;
@@ -92,6 +94,7 @@ public class BmobUtils {
 //                        Log.d("BmobUtils", list.toString());
                         if (e == null&&!list.isEmpty()) {
                             emitter.onNext(list.get(0));
+                            emitter.onComplete();
                         }else {
                             emitter.onError(e==null?new Throwable(""):e);
                         }
@@ -111,6 +114,7 @@ public class BmobUtils {
                         if (e == null) {
                             Log.d("BmobUtils", "成功上传 id = "+s);
                             emitter.onNext(s);
+                            emitter.onComplete();
                         }else {
                             emitter.onError(e);
                         }
@@ -132,6 +136,7 @@ public class BmobUtils {
 //                        Log.d("BmobUtils", list.toString());
                         if (e == null&&!list.isEmpty()) {
                             emitter.onNext(list.get(0));
+                            emitter.onComplete();
                         }else {
                             emitter.onError(e==null?new Throwable("不需要更新"):e);
                         }
@@ -154,6 +159,7 @@ public class BmobUtils {
                         if (urls.size() == path.length) {
                             Log.d("FileUtils", "全部上传成功");
                             emitter.onNext(urls);
+                            emitter.onComplete();
                         }
                     }
 
@@ -181,6 +187,7 @@ public class BmobUtils {
                     public void done(DataWx wx, BmobException e) {
                         if (e == null) {
                             emitter.onNext(wx);
+                            emitter.onComplete();
                         }else {
                             emitter.onError(e);
                         }
@@ -200,6 +207,7 @@ public class BmobUtils {
                     public void done(Integer integer, BmobException e) {
                         if (e == null) {
                             emitter.onNext(integer);
+                            emitter.onComplete();
                         }else{
                             emitter.onError(e);
                         }
@@ -218,6 +226,7 @@ public class BmobUtils {
                     public void done(UserBean userBean, BmobException e) {
                         if (userBean == null) {
                             emitter.onNext(userBean);
+                            emitter.onComplete();
                         }else {
                             emitter.onError(e);
                         }
@@ -237,6 +246,7 @@ public class BmobUtils {
                     public void done(Team team, BmobException e) {
                         if (e == null) {
                             emitter.onNext(team);
+                            emitter.onComplete();
                         }else {
                             emitter.onError(e);
                         }
@@ -269,6 +279,7 @@ public class BmobUtils {
                                 public void done(List<DataWx> list, BmobException e) {
                                     if (e == null) {
                                         emitter.onNext(list);
+                                        emitter.onComplete();
                                         Log.d("BmobUtils", "list.size():" + list.size());
                                     }else {
                                         emitter.onError(e);
@@ -296,6 +307,7 @@ public class BmobUtils {
                                 public void done(List<DataWx> list, BmobException e) {
                                     if (e == null) {
                                         emitter.onNext(list);
+                                        emitter.onComplete();
                                         Log.d("BmobUtils", "list.size():" + list.size());
                                     }else {
                                         emitter.onError(e);
@@ -329,6 +341,7 @@ public class BmobUtils {
                     public void done(String s, BmobException e) {
                         if (e == null) {
                             emitter.onNext(s);
+                            emitter.onComplete();
                         }else {
                             emitter.onError(e);
                         }
@@ -352,6 +365,7 @@ public class BmobUtils {
                     public void done(BmobException e) {
                         if (e == null) {
                             emitter.onNext("成功");
+                            emitter.onComplete();
                         }else {
                             emitter.onError(e);
                         }
@@ -372,6 +386,7 @@ public class BmobUtils {
 
                 if (!ifNetWorlk&&MyApp.getApp().getTeam() != null) {
                     emitter.onNext(MyApp.getApp().getTeam());
+                    emitter.onComplete();
                 }else {
                     UserBean userBean = MyApp.getApp().getUser();
                     BmobQuery<UserBean> teamQ = new BmobQuery<>();
@@ -383,6 +398,7 @@ public class BmobUtils {
                             if (e == null) {
                                 MyApp.getApp().setTeam(userBean.getTeam());
                                 emitter.onNext(userBean.getTeam());
+                                emitter.onComplete();
                             }else {
                                 emitter.onError(e);
                             }
@@ -407,6 +423,7 @@ public class BmobUtils {
                             public void done(List<UserBean> list, BmobException e) {
                                 if (e == null) {
                                     emitter.onNext(list);
+                                    emitter.onComplete();
 //                                    Log.d("BmobUtils", "list.size():" + list.size());
 //                                    Log.d("BmobUtils", list.get(0).getUsername());
                                 }else {
@@ -414,6 +431,120 @@ public class BmobUtils {
                                 }
                             }
                         });
+            }
+        });
+    }
+
+    public static Observable<UserBean> registUser(final String userName, final String password) {
+        return Observable.create(new ObservableOnSubscribe<UserBean>() {
+            @Override
+            public void subscribe(final ObservableEmitter<UserBean> emitter) throws Exception {
+                UserBean userBean = new UserBean();
+                userBean.setUsername(userName);
+                userBean.setPassword(password);
+                userBean.signUp(new SaveListener<UserBean>() {
+                    @Override
+                    public void done(UserBean userBean, BmobException e) {
+                        if (e == null) {
+                            emitter.onNext(userBean);
+                            emitter.onComplete();
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<List<DataWx>> findDataWxToUser(final String userid, final int pagesize, final int pageno) {
+        return Observable.create(new ObservableOnSubscribe<List<DataWx>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<List<DataWx>> emitter) throws Exception {
+                UserBean userBean = new UserBean();
+                userBean.setObjectId(userid);
+                BmobQuery<DataWx> dataWxBmobQuery = new BmobQuery<>();
+                dataWxBmobQuery.addWhereEqualTo("user", new BmobPointer(userBean));
+                dataWxBmobQuery.include("user");
+                dataWxBmobQuery.setLimit(pagesize).setSkip(pageno * pagesize).findObjects(new FindListener<DataWx>() {
+                    @Override
+                    public void done(List<DataWx> list, BmobException e) {
+                        if (e == null) {
+                            emitter.onNext(list);
+                            emitter.onComplete();
+                            emitter.onComplete();
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static List<CirlceBean> dataWxToCirlceBean(List<DataWx> dataWxList) {
+        List<CirlceBean> cirlceBeanList = new ArrayList<>();
+        for (int i = 0; i < dataWxList.size(); i++) {
+            DataWx dataWx = dataWxList.get(i);
+            CirlceBean bean = new CirlceBean();
+            bean.setObjeId(dataWx.getObjectId());
+            bean.setContent(dataWx.getText());
+            bean.setImageUrls(dataWx.getImage());
+            bean.setTime(dataWx.getCreatedAt());
+            if (dataWx.getUser() != null) {
+                bean.setAvatarUrl(dataWx.getUser().getUseravatar());
+                bean.setUserName(dataWx.getUser().getUsername());
+//                                Log.d(TAG, dataWx.getUser().getMobilePhoneNumber() + "");
+            }
+            cirlceBeanList.add(bean);
+        }
+        return cirlceBeanList;
+    }
+
+    /**
+     * 删除条目
+     * @param objID
+     * @return
+     */
+    public static Observable<String> removeDataWx(final String objID) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                DataWx dataWx = new DataWx();
+                dataWx.setObjectId(objID);
+                dataWx.delete(new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e == null) {
+                            emitter.onNext("成功删除");
+                            emitter.onComplete();
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<String> removeUserToTeam(final String userid) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                UserBean userBean = new UserBean();
+//                userBean.setTeam(new Team());
+                userBean.remove("team");
+                userBean.update(userid, new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e == null) {
+                            emitter.onNext("成功");
+                            emitter.onComplete();
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
             }
         });
     }

@@ -97,5 +97,6 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_team">TeamActivity</string>
+    <string name="title_activity_team">我的团队</string>
+    <string name="title_activity_my_circle">我的发布</string>
 </resources>

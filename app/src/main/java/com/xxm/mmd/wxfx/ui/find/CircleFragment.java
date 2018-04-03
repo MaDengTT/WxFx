@@ -131,20 +131,8 @@ public class CircleFragment extends BaseFrament {
                 .flatMap(new Function<List<DataWx>, ObservableSource<List<CirlceBean>>>() {
                     @Override
                     public ObservableSource<List<CirlceBean>> apply(List<DataWx> dataWxes) throws Exception {
-                        List<CirlceBean> cirlceBeanList = new ArrayList<>();
-                        for (int i = 0; i < dataWxes.size(); i++) {
-                            DataWx dataWx = dataWxes.get(i);
-                            CirlceBean bean = new CirlceBean();
-                            bean.setContent(dataWx.getText());
-                            bean.setImageUrls(dataWx.getImage());
-                            if (dataWx.getUser() != null) {
-                                bean.setAvatarUrl(dataWx.getUser().getUseravatar());
-                                bean.setUserName(dataWx.getUser().getUsername());
-                                Log.d(TAG, dataWx.getUser().getMobilePhoneNumber() + "");
-                            }
-                            cirlceBeanList.add(bean);
-                        }
-                        return Observable.just(cirlceBeanList);
+
+                        return Observable.just(BmobUtils.dataWxToCirlceBean(dataWxes));
                     }
                 })
                 .doOnTerminate(new Action() {

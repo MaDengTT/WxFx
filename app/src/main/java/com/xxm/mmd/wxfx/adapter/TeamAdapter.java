@@ -3,6 +3,7 @@ package com.xxm.mmd.wxfx.adapter;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.SwitchCompat;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -26,7 +27,16 @@ public class TeamAdapter extends BaseQuickAdapter<UserBean,BaseViewHolder> {
     protected void convert(BaseViewHolder helper, UserBean item) {
         helper.setText(R.id.tv_user_name,item.getUsername());
         GlideLoader.loadNormal((ImageView) helper.getView(R.id.iv_avatar),item.getUseravatar());
-        SwitchCompat view = helper.getView(R.id.switch_post);
-        view.setChecked(item.getPostPerToTeam()==null?false:true);
+//        SwitchCompat view = helper.getView(R.id.switch_post);
+//        view.setChecked(item.getPostPerToTeam()==null?false:true);
+
+        helper.addOnClickListener(R.id.tv_del);
+//        view.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//
+//            }
+//        });
+
     }
 }

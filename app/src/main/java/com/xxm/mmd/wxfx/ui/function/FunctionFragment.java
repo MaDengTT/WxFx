@@ -10,10 +10,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.FunctionAdapter;
 import com.xxm.mmd.wxfx.bean.FunctionBean;
 import com.xxm.mmd.wxfx.ui.BaseFrament;
+import com.xxm.mmd.wxfx.ui.MainActivity;
+import com.xxm.mmd.wxfx.ui.UpdateActivity;
+import com.xxm.mmd.wxfx.ui.ZxingActivity;
 import com.xxm.mmd.wxfx.utils.SysUtils;
 import com.xxm.mmd.wxfx.view.GridMarginDecoration;
 
@@ -61,10 +65,8 @@ public class FunctionFragment extends BaseFrament {
 
     private void initData() {
         List<FunctionBean> data = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            data.add(new FunctionBean(0, "", ""));
-            data.add(new FunctionBean(0, "", ""));
-        }
+        data.add(new FunctionBean(R.drawable.ic_update, "上传", "上传信息至服务器", UpdateActivity.class));
+        data.add(new FunctionBean(R.drawable.ic_scan, "扫一扫", "打开扫一扫功能", ZxingActivity.class));
 
         adapter.setNewData(data);
     }
@@ -76,6 +78,20 @@ public class FunctionFragment extends BaseFrament {
         recyclerView.addItemDecoration(new GridMarginDecoration(SysUtils.dp2px(getContext(), 16), SysUtils.dp2px(getContext(), 16)));
         adapter = new FunctionAdapter(null);
         recyclerView.setAdapter(adapter);
+
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                FunctionBean item = (FunctionBean) adapter.getItem(position);
+                if (item.getaClass() != null) {
+                    if (item.getaClass().getName().equals(ZxingActivity.class.getName())) {
+                        ((MainActivity)getActivity()).startZxing();
+                    }else {
+                        ((MainActivity)getActivity()).startActivtity(item.getaClass());
+                    }
+                }
+            }
+        });
     }
 
     @Override

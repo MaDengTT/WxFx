@@ -110,7 +110,12 @@
             android:label="@string/title_activity_team"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ui.CreateTeamActivity" />
-        <activity android:name=".ui.BigImageActivity"></activity>
+        <activity android:name=".ui.BigImageActivity" />
+        <activity android:name=".ui.RegisterActivity" />
+        <activity
+            android:name=".ui.MyCircleActivity"
+            android:label="@string/title_activity_my_circle"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

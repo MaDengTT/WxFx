@@ -28,6 +28,7 @@
         />
 
     <android.support.v7.widget.SwitchCompat
+        android:visibility="gone"
         android:id="@+id/switch_post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,4 +41,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
+    <TextView
+        android:id="@+id/tv_del"
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="删除"
+        android:textColor="@android:color/holo_red_dark"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_user_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_user_name" />
 </android.support.constraint.ConstraintLayout>

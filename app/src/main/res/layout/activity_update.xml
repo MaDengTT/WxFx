@@ -37,7 +37,6 @@
         android:gravity="top"
         android:hint="分享有趣的事"
         android:inputType="textMultiLine"
-        android:maxLength="140"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="10dp"

@@ -94,20 +94,20 @@ public class GlideLoader {
                     .into(imageView);
         }
     }
-    public static void loadNormal(ImageView imageView, int rId) {
-
-            GlideApp.with(imageView.getContext())
-                    .asBitmap()
-                    .load(rId)
-//                    .placeholder(R.drawable.bg_shot)
-                    .centerCrop()
-//                    .error(R.drawable.bg_shot)
-                    .into(imageView);
-    }
+//    public static void loadNormal(ImageView imageView, int rId) {
+//
+//            GlideApp.with(imageView.getContext())
+//                    .asBitmap()
+//                    .load(rId)
+////                    .placeholder(R.drawable.bg_shot)
+//                    .centerCrop()
+////                    .error(R.drawable.bg_shot)
+//                    .into(imageView);
+//    }
     public static void loadNormal(ImageView imageView, Object object) {
 
             GlideApp.with(imageView.getContext())
-                    .asBitmap()
+//                    .asBitmap()
                     .load(object)
 //                    .placeholder(R.drawable.bg_shot)
                     .centerCrop()

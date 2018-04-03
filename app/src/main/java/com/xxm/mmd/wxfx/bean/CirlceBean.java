@@ -12,6 +12,26 @@ public class CirlceBean {
     String content;
     List<String> imageUrls;
 
+    String objeId;
+
+    String time;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getObjeId() {
+        return objeId;
+    }
+
+    public void setObjeId(String objeId) {
+        this.objeId = objeId;
+    }
+
     public String getAvatarUrl() {
         return avatarUrl;
     }
