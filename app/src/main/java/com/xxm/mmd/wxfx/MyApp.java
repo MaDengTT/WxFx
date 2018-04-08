@@ -5,6 +5,7 @@ import android.app.Application;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 import com.xxm.mmd.wxfx.bean.Team;
 import com.xxm.mmd.wxfx.bean.UserBean;
+import com.xxm.mmd.wxfx.dagger.component.DaggerAppComponent;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
 
 import abc.abc.abc.AdManager;
@@ -37,6 +38,8 @@ public class MyApp extends Application {
         ZXingLibrary.initDisplayOpinion(this);
         JAnalyticsInterface.init(this);
         JAnalyticsInterface.setDebugMode(true);
+
+        DaggerAppComponent.create().inject(this);
     }
 
     public static MyApp getApp() {

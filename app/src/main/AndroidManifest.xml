@@ -115,7 +115,8 @@
         <activity
             android:name=".ui.MyCircleActivity"
             android:label="@string/title_activity_my_circle"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.Login2Activity"></activity>
     </application>
 
 </manifest>
