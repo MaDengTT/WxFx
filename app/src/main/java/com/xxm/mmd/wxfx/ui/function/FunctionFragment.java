@@ -1,7 +1,12 @@
 package com.xxm.mmd.wxfx.ui.function;
 
 
+import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,15 +14,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.FunctionAdapter;
 import com.xxm.mmd.wxfx.bean.FunctionBean;
+import com.xxm.mmd.wxfx.ui.AddFriendActivity;
+import com.xxm.mmd.wxfx.ui.AddFriendPhoneActivity;
+import com.xxm.mmd.wxfx.ui.AutoLikeActivity;
 import com.xxm.mmd.wxfx.ui.BaseFrament;
 import com.xxm.mmd.wxfx.ui.MainActivity;
+import com.xxm.mmd.wxfx.ui.PhoneActivity;
 import com.xxm.mmd.wxfx.ui.UpdateActivity;
 import com.xxm.mmd.wxfx.ui.ZxingActivity;
+import com.xxm.mmd.wxfx.utils.DialogHelp;
+import com.xxm.mmd.wxfx.utils.ServiceHelper;
 import com.xxm.mmd.wxfx.utils.SysUtils;
 import com.xxm.mmd.wxfx.view.GridMarginDecoration;
 
@@ -65,8 +77,12 @@ public class FunctionFragment extends BaseFrament {
 
     private void initData() {
         List<FunctionBean> data = new ArrayList<>();
-        data.add(new FunctionBean(R.drawable.ic_update, "上传", "上传信息至服务器", UpdateActivity.class));
+        data.add(new FunctionBean(R.drawable.ic_update, "上传", "上传朋友圈至服务器", UpdateActivity.class));
         data.add(new FunctionBean(R.drawable.ic_scan, "扫一扫", "打开扫一扫功能", ZxingActivity.class));
+        data.add(new FunctionBean(R.drawable.ic_scan, "通讯录", "生成通讯录号码", PhoneActivity.class));
+        data.add(new FunctionBean(R.drawable.ic_scan, "自动加好友", "自动从通讯录添加好友", AddFriendPhoneActivity.class));
+        data.add(new FunctionBean(R.drawable.ic_scan, "精准加好友", "精准添加好友", AddFriendActivity.class));
+        data.add(new FunctionBean(R.drawable.ic_scan, "自动点赞", "朋友圈自动点赞", AutoLikeActivity.class));
 
         adapter.setNewData(data);
     }
@@ -87,7 +103,13 @@ public class FunctionFragment extends BaseFrament {
                     if (item.getaClass().getName().equals(ZxingActivity.class.getName())) {
                         ((MainActivity)getActivity()).startZxing();
                     }else {
-                        ((MainActivity)getActivity()).startActivtity(item.getaClass());
+
+                        if (!ServiceHelper.AccessibilityIsRunning(getContext())) {
+                            ServiceHelper.startAccessibilityService(getActivity());
+                        }else {
+                            ((MainActivity)getActivity()).startActivtity(item.getaClass());
+                        }
+
                     }
                 }
             }
@@ -99,4 +121,8 @@ public class FunctionFragment extends BaseFrament {
         super.onDestroyView();
         unbinder.unbind();
     }
+
+
+
+
 }

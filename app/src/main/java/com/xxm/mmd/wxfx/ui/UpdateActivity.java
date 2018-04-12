@@ -18,6 +18,7 @@ import com.lzy.imagepicker.bean.ImageItem;
 import com.lzy.imagepicker.ui.ImageGridActivity;
 import com.lzy.imagepicker.view.CropImageView;
 import com.xxm.mmd.wxfx.BuildConfig;
+import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.ImageAdapter;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
@@ -153,6 +154,23 @@ public class UpdateActivity extends BaseActivity {
 
     private void initView() {
 
+        swToSquare.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (compoundButton.isChecked()) {
+                    if (MyApp.getApp().getUser() == null) {
+                        Toast.makeText(UpdateActivity.this, "请登录", Toast.LENGTH_SHORT).show();
+                        Login2Activity.start(UpdateActivity.this);
+                        return;
+                    }
+                    if (MyApp.getApp().getUser().getVip() < 1) {
+                        Toast.makeText(UpdateActivity.this, "您还不是会员无法同步", Toast.LENGTH_SHORT).show();
+                        compoundButton.setChecked(false);
+                    }
+                }
+            }
+        });
+
         setTitleName("发送朋友圈");
         editText = findViewById(R.id.et_content);
         recyclerView = findViewById(R.id.recycler);
@@ -188,7 +206,7 @@ public class UpdateActivity extends BaseActivity {
                         .subscribe(new Consumer<String>() {
                             @Override
                             public void accept(String s) throws Exception {
-                                ImageActivity.start(UpdateActivity.this, s);
+                                ImageActivity.start(UpdateActivity.this, s,false);
                                 finish();
                             }
                         }, new Consumer<Throwable>() {

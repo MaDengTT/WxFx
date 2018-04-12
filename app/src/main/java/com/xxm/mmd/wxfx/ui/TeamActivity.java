@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -66,8 +67,7 @@ public class TeamActivity extends BaseActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                ImageActivity.start(TeamActivity.this,team.getObjectId(),true);
             }
         });
         team = (Team) getIntent().getSerializableExtra("teamId");
@@ -94,6 +94,7 @@ public class TeamActivity extends BaseActivity {
     private void initView() {
         recycler.setLayoutManager(new LinearLayoutManager(this));
         teamAdapter = new TeamAdapter(null);
+        teamAdapter.setAdminid(team.getAdminUser().getObjectId());
         recycler.setAdapter(teamAdapter);
 
         teamAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
@@ -102,6 +103,11 @@ public class TeamActivity extends BaseActivity {
                 switch (view.getId()) {
                     case R.id.tv_del:
                         UserBean item = teamAdapter.getItem(position);
+
+                        if (TextUtils.equals(item.getObjectId(), team.getAdminUser().getObjectId())) {
+                            return;
+                        }
+
                         BmobUtils.removeUserToTeam(item.getObjectId())
                                 .subscribe(new Consumer<String>() {
                                     @Override

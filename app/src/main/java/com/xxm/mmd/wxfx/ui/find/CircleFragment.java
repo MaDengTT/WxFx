@@ -1,5 +1,6 @@
 package com.xxm.mmd.wxfx.ui.find;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -10,18 +11,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.loadmore.SimpleLoadMoreView;
+import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.CircleAdapter;
 import com.xxm.mmd.wxfx.bean.CirlceBean;
 import com.xxm.mmd.wxfx.bean.DataWx;
 import com.xxm.mmd.wxfx.bean.Team;
+import com.xxm.mmd.wxfx.bean.UserBean;
 import com.xxm.mmd.wxfx.ui.BaseFrament;
 import com.xxm.mmd.wxfx.ui.CreateTeamActivity;
+import com.xxm.mmd.wxfx.ui.Login2Activity;
+import com.xxm.mmd.wxfx.ui.MainActivity;
+import com.xxm.mmd.wxfx.ui.ZxingActivity;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
 import com.xxm.mmd.wxfx.utils.WeiXinShareUtil;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,9 +111,20 @@ public class CircleFragment extends BaseFrament {
             initData("");
         } else if (mParam1.equals("1")) {
             clEmpty.setVisibility(View.VISIBLE);
+            EventBus.getDefault().register(this);
             initTeam();
         }
         return view;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
+
+    public void setTeamView(Team team) {
+        initTeam();
+    }
+    @Subscribe(threadMode = ThreadMode.MAIN_ORDERED)
+    public void setTeamView(UserBean userBean) {
+        initTeam();
     }
 
     private void initTeam() {
@@ -119,6 +141,7 @@ public class CircleFragment extends BaseFrament {
                     @Override
                     public void accept(Throwable throwable) throws Exception {
                         Log.e(TAG, "accept: ", throwable);
+                        clEmpty.setVisibility(View.VISIBLE);
                     }
                 });
     }
@@ -230,25 +253,23 @@ public class CircleFragment extends BaseFrament {
 
     @OnClick({R.id.but_create, R.id.but_add})
     public void onViewClicked(View view) {
+        if (MyApp.getApp().getUser() == null) {
+            Toast.makeText(getActivity(), "请登录", Toast.LENGTH_SHORT).show();
+            Login2Activity.start(getActivity());
+            return;
+        }
         switch (view.getId()) {
             case R.id.but_create:
+
+                if (MyApp.getApp().getUser().getVip() < 2) {
+                    Toast.makeText(getActivity(), "您的会员等级不足，请升级会员创建", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 CreateTeamActivity.start(getActivity());
                 break;
             case R.id.but_add:
-
-                BmobUtils.addTotoTeam("07820a5ed9")
-                        .subscribe(new Consumer<String>() {
-                            @Override
-                            public void accept(String s) throws Exception {
-                                Log.d(TAG, s);
-                            }
-                        }, new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                Log.e(TAG, "accept: ", throwable);
-                            }
-                        });
-
+                ((MainActivity)getActivity()).startZxingToTeam();
                 break;
         }
     }

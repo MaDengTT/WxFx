@@ -31,9 +31,14 @@ public class ImageActivity extends BaseActivity {
 
     private Button but_load;
     private Button but_share;
-    public static void start(Context context,String s) {
+
+    boolean ifTeam = false;
+    private String urls;
+
+    public static void start(Context context,String s,boolean ifteam) {
         Intent starter = new Intent(context, ImageActivity.class);
         starter.putExtra("bitmap",s);
+        starter.putExtra("if", ifteam);
         context.startActivity(starter);
     }
 
@@ -49,12 +54,17 @@ public class ImageActivity extends BaseActivity {
         initView();
 
         bitmapS = getIntent().getStringExtra("bitmap");
+        ifTeam = getIntent().getBooleanExtra("if", false);
         initView();
     }
 
     private static final String TAG = "ImageActivity";
     private void initView() {
-        setTitleName("我的二维码");
+        if (ifTeam) {
+            setTitleName("我的团队二维码");
+        }else {
+            setTitleName("我的二维码");
+        }
         but_load = findViewById(R.id.but_load);
         but_share = findViewById(R.id.but_share);
 
@@ -106,7 +116,11 @@ public class ImageActivity extends BaseActivity {
 
         iv = findViewById(R.id.iv_image);
         if (!TextUtils.isEmpty(bitmapS)) {
-            String urls = SysUtils.getStringUrl(bitmapS);
+            if (!ifTeam) {
+                urls = SysUtils.getStringUrl(bitmapS);
+            }else {
+                urls = bitmapS;
+            }
             ImageUtils.createImage(urls).subscribe(new Consumer<Bitmap>() {
                 @Override
                 public void accept(Bitmap bitmap) throws Exception {

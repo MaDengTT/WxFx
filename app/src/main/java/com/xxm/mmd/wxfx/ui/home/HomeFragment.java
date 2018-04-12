@@ -3,6 +3,7 @@ package com.xxm.mmd.wxfx.ui.home;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,19 +12,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.R;
-import com.xxm.mmd.wxfx.adapter.CircleAdapter;
-import com.xxm.mmd.wxfx.bean.CirlceBean;
-import com.xxm.mmd.wxfx.bean.DataWx;
+import com.xxm.mmd.wxfx.adapter.UserCardAdapter;
+import com.xxm.mmd.wxfx.bean.HomePage;
+import com.xxm.mmd.wxfx.contast.Contast;
 import com.xxm.mmd.wxfx.glide.BannerGlideLoader;
 import com.xxm.mmd.wxfx.ui.BaseFrament;
+import com.xxm.mmd.wxfx.ui.EditHomeActivity;
+import com.xxm.mmd.wxfx.ui.Login2Activity;
 import com.xxm.mmd.wxfx.ui.MainActivity;
 import com.xxm.mmd.wxfx.ui.UpdateActivity;
 import com.xxm.mmd.wxfx.ui.ZxingActivity;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
-import com.xxm.mmd.wxfx.utils.WeiXinShareUtil;
+import com.xxm.mmd.wxfx.utils.DialogHelp;
+import com.xxm.mmd.wxfx.utils.ServiceHelper;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
@@ -33,11 +39,10 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 
 public class HomeFragment extends BaseFrament implements View.OnClickListener {
@@ -45,6 +50,8 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
     Unbinder unbinder;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
     private CardView cvUpdate, cvScan;
 
     ProgressDialog dialog;
@@ -53,7 +60,12 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
 
     Banner banner;
 
-    CircleAdapter adapter;
+
+    UserCardAdapter adapter;
+    private View viewTop;
+    private int pageSize = 10;
+    private int pageNo = 0;
+    private ProgressDialog waitDialog;
 
     public HomeFragment() {
 
@@ -75,7 +87,7 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_home, container, false);
+        view = inflater.inflate(R.layout.content_home, container, false);
         unbinder = ButterKnife.bind(this, view);
         initView();
 
@@ -90,45 +102,39 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
         return view;
     }
 
+
     private void initData() {
 
-        BmobUtils.getDataWxs("",10,0)
-                .flatMap(new Function<List<DataWx>, ObservableSource<List<CirlceBean>>>() {
-                    @Override
-                    public ObservableSource<List<CirlceBean>> apply(List<DataWx> dataWxes) throws Exception {
-                        List<CirlceBean> cirlceBeanList = new ArrayList<>();
-                        for (int i = 0; i < dataWxes.size(); i++) {
-                            DataWx dataWx = dataWxes.get(i);
-                            CirlceBean bean = new CirlceBean();
-                            bean.setContent(dataWx.getText());
-                            bean.setImageUrls(dataWx.getImage());
-                            if (dataWx.getUser() != null) {
-                                bean.setAvatarUrl(dataWx.getUser().getUseravatar());
-                                bean.setUserName(dataWx.getUser().getUsername());
-//                                Log.d(TAG, dataWx.getUser().getMobilePhoneNumber() + "");
-                            }
-                            cirlceBeanList.add(bean);
-                        }
-                        return Observable.just(cirlceBeanList);
-                    }
-                })
-                .subscribe(new Consumer<List<CirlceBean>>() {
-                    @Override
-                    public void accept(List<CirlceBean> cirlceBeans) throws Exception {
-                        setData(cirlceBeans);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e(TAG, "accept: ",throwable );
-                    }
-                });
+        BmobUtils.findHomeBean(pageSize, pageNo)
+        .subscribe(new Observer<List<HomePage>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                waitDialog.show();
+            }
+
+            @Override
+            public void onNext(List<HomePage> homePages) {
+                setData(homePages);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e(TAG, "onError: ",e );
+                waitDialog.dismiss();
+            }
+
+            @Override
+            public void onComplete() {
+                waitDialog.dismiss();
+            }
+        });
 
 
     }
 
     private static final String TAG = "HomeFragment";
-    private void setData(List<CirlceBean> data) {
+
+    private void setData(List<HomePage> data) {
         adapter.setNewData(data);
     }
 
@@ -174,22 +180,28 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
 //    }
     private void initView() {
 
+        waitDialog = DialogHelp.getWaitDialog(getActivity(), "请稍后");
+
+        viewTop = getLayoutInflater().inflate(R.layout.home_top, null,false);
+
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setNestedScrollingEnabled(false);
-        adapter = new CircleAdapter(null);
+        adapter = new UserCardAdapter(null);
+        adapter.addHeaderView(viewTop);
         recyclerView.setAdapter(adapter);
 
 //        ivBanner = view.findViewById(R.id.iv_banner);
 
-        setTitleName((TextView) view.findViewById(R.id.tv_title), "微信转发助手");
+        setTitleName((TextView) this.view.findViewById(R.id.tv_title), "微信转发助手");
 
-        banner = view.findViewById(R.id.iv_banner);
+        banner = viewTop.findViewById(R.id.iv_banner);
         dialog = new ProgressDialog(getActivity());
         dialog.setTitle("请稍后");
         dialog.setCanceledOnTouchOutside(false);
 
-        cvUpdate = view.findViewById(R.id.cv_update);
-        cvScan = view.findViewById(R.id.cv_scan);
+        cvUpdate = viewTop.findViewById(R.id.cv_update);
+        cvScan = viewTop.findViewById(R.id.cv_scan);
 
         cvScan.setOnClickListener(this);
         cvUpdate.setOnClickListener(this);
@@ -198,9 +210,16 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 switch (view.getId()) {
-                    case R.id.tv_share:
-                        CirlceBean item = (CirlceBean) adapter.getItem(position);
-                        WeiXinShareUtil.shareDataToWx(item,getActivity());
+                    case R.id.but_add:
+                        if (!ServiceHelper.AccessibilityIsRunning(getActivity())) {
+                            ServiceHelper.startAccessibilityService(getActivity());
+                        } else {
+                            Intent intent = new Intent();
+                            intent.setAction(Contast.accessBroad);
+                            intent.putExtra(Contast.BroadType, Contast.addFriendText);
+                            intent.putExtra(Contast.BroadNameID, ((HomePage)adapter.getItem(position)).getWxInfo());
+                            getActivity().sendBroadcast(intent);
+                        }
                         break;
                 }
             }
@@ -247,5 +266,15 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @OnClick(R.id.fab)
+    public void onViewClicked() {
+        if (MyApp.getApp().getUser() == null) {
+            Toast.makeText(getActivity(), "请登录", Toast.LENGTH_SHORT).show();
+            Login2Activity.start(getActivity());
+        }else {
+            EditHomeActivity.start(getActivity());
+        }
     }
 }

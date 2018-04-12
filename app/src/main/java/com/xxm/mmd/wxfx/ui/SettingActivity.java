@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.bean.UpdateSys;
+import com.xxm.mmd.wxfx.bean.UserBean;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
 import com.xxm.mmd.wxfx.utils.FileUtils;
 import com.xxm.mmd.wxfx.utils.ImageUtils;
@@ -25,9 +26,12 @@ import com.xxm.mmd.wxfx.utils.SysUtils;
 import com.xxm.mmd.wxfx.utils.UpdateManager;
 import com.xxm.mmd.wxfx.utils.WeiXinShareUtil;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.File;
 import java.util.List;
 
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.bmob.v3.BmobUser;
 import io.reactivex.Observable;
@@ -58,6 +62,7 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ButterKnife.bind(this);
         findViewById(R.id.ll_update).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -295,5 +300,7 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
     @OnClick(R.id.loginout)
     public void onViewClicked() {
         BmobUser.logOut();
+        EventBus.getDefault().post(new UserBean());
+        Toast.makeText(this, "用户以退出", Toast.LENGTH_SHORT).show();
     }
 }

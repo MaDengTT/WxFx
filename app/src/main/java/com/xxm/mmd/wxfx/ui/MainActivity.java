@@ -201,8 +201,20 @@ public class MainActivity extends AppCompatActivity{
                 }
                 if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
                     String result = bundle.getString(CodeUtils.RESULT_STRING);
-                    Log.d("MainActivity", result);
-                    WeiXinShareUtil.shareDataToWx(result,MainActivity.this);
+                    BmobUtils.addTotoTeam(result)
+                            .subscribe(new Consumer<String>() {
+                                @Override
+                                public void accept(String s) throws Exception {
+//                                    Log.d(TAG, s);
+                                    Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+                                }
+                            }, new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) throws Exception {
+                                    Log.e("aa", "accept: ", throwable);
+                                    Log.d("MainActivity", "加入失败");
+                                }
+                            });
                 } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
                     String result = bundle.getString(CodeUtils.RESULT_STRING);
                     Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
@@ -220,7 +232,12 @@ public class MainActivity extends AppCompatActivity{
         }
     }
     public void startZxing() {
+
+    }
+
+    public void startZxingToTeam() {
         Intent intent = new Intent(this, ZxingActivity.class);
+        intent.putExtra(ZxingActivity.TEAM_S, ZxingActivity.TEAM_);
         this.startActivityForResult(intent, MainActivity.REQUEST_CODE);
     }
 

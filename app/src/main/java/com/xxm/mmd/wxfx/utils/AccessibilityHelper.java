@@ -2,9 +2,18 @@ package com.xxm.mmd.wxfx.utils;
 
 import android.accessibilityservice.AccessibilityService;
 import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.icu.text.AlphabeticIndex;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import com.xxm.mmd.wxfx.MyApp;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -25,6 +34,27 @@ public final class AccessibilityHelper {
             }
         }
         return null;
+    }
+
+    public static void putStringToNodeInfo(AccessibilityNodeInfo nodeInfo, String s) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Bundle arguments = new Bundle();
+            arguments.putCharSequence(
+                    AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, s);
+            nodeInfo.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
+        }else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                ClipboardManager clipboard = (ClipboardManager) MyApp.getApp().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("",s);
+                clipboard.setPrimaryClip(clip);
+                nodeInfo.performAction(AccessibilityNodeInfo.ACTION_FOCUS);
+                nodeInfo.performAction(AccessibilityNodeInfo.ACTION_PASTE);
+            }
+        }
+
+
+
     }
 
     /** 通过文本查找*/
@@ -135,4 +165,23 @@ public final class AccessibilityHelper {
             performClick(nodeInfo.getParent());
         }
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+    public static void WXfindIdTextAndClick(AccessibilityNodeInfo nodeInfo, String id, String text, int i) {
+        // 查找当前窗口中id为“id”的按钮
+        AccessibilityNodeInfo targetNode = null;
+        if (targetNode == null) {
+            List<AccessibilityNodeInfo> list = nodeInfo
+                    .findAccessibilityNodeInfosByViewId("com.tencent.mm:id/" + id);
+            if (list.size() > 0) {
+                targetNode = list.get(i);
+                Log.i("890", targetNode + "node");
+                if (targetNode.getText().equals(text)) {
+                    performClick(targetNode);
+                }
+            }
+        }
+
+    }
+
 }

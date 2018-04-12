@@ -24,18 +24,30 @@ import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.utils.FileUtils;
 import com.xxm.mmd.wxfx.utils.ImageUtils;
+import com.xxm.mmd.wxfx.utils.SysUtils;
+import com.xxm.mmd.wxfx.utils.WeiXinShareUtil;
 
 import org.apache.http.client.utils.URIUtils;
 
 import java.io.File;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 public class ZxingActivity extends BaseActivity {
 
     private CodeUtils.AnalyzeCallback analyzeCallback;
     private int REQUEST_IMAGE = 0x233;
     private static int CAMERA_REQUEST_CODE = 0x896;
+
+
+    public static int TEAM_ = 0x4532;
+    public static String TEAM_S = "teams";
+
+    boolean ifTeam = false;
 
     @Override
     protected int getLayoutId() {
@@ -46,6 +58,10 @@ public class ZxingActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        int intExtra = getIntent().getIntExtra(TEAM_S, 0);
+        if (intExtra == TEAM_) {
+            ifTeam = true;
+        }
 
         startFragment();
         findViewById(R.id.butToPhoto)
@@ -151,22 +167,63 @@ public class ZxingActivity extends BaseActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-
+    private static final String TAG = "ZxingActivity";
     private void backActivity(String s, boolean isOk) {
-        Intent resultIntent = new Intent();
-        Bundle bundle = new Bundle();
-        if (isOk) {
-            bundle.putInt(CodeUtils.RESULT_TYPE, CodeUtils.RESULT_SUCCESS);
-            bundle.putString(CodeUtils.RESULT_STRING, s);
-            resultIntent.putExtras(bundle);
-            ZxingActivity.this.setResult(RESULT_OK, resultIntent);
-            ZxingActivity.this.finish();
+
+        if (ifTeam) {
+            Intent resultIntent = new Intent();
+            Bundle bundle = new Bundle();
+            if (isOk) {
+                bundle.putInt(CodeUtils.RESULT_TYPE, CodeUtils.RESULT_SUCCESS);
+                bundle.putString(CodeUtils.RESULT_STRING, s);
+                resultIntent.putExtras(bundle);
+                ZxingActivity.this.setResult(RESULT_OK, resultIntent);
+                ZxingActivity.this.finish();
+            }else {
+                bundle.putInt(CodeUtils.RESULT_TYPE, CodeUtils.RESULT_FAILED);
+                bundle.putString(CodeUtils.RESULT_STRING, "图片格式错误");
+                resultIntent.putExtras(bundle);
+                ZxingActivity.this.setResult(RESULT_OK, resultIntent);
+                ZxingActivity.this.finish();
+            }
         }else {
-            bundle.putInt(CodeUtils.RESULT_TYPE, CodeUtils.RESULT_FAILED);
-            bundle.putString(CodeUtils.RESULT_STRING, "图片格式错误");
-            resultIntent.putExtras(bundle);
-            ZxingActivity.this.setResult(RESULT_OK, resultIntent);
-            ZxingActivity.this.finish();
+            if (!isOk) {
+                return;
+            }
+
+            Observable.just(s)
+                    .map(new Function<String, String>() {
+                        @Override
+                        public String apply(String s) throws Exception {
+                            return SysUtils.getStringID(s);
+                        }
+                    }).subscribe(new Observer<String>() {
+                @Override
+                public void onSubscribe(Disposable d) {
+
+                }
+
+                @Override
+                public void onNext(String s) {
+                    WeiXinShareUtil.shareDataToWx(s,ZxingActivity.this);
+                    finish();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.e(TAG, "onError: ",e );
+                    Toast.makeText(ZxingActivity.this, "图片格式错误", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onComplete() {
+
+                }
+            });
         }
+
+
+
+
     }
 }

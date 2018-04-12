@@ -7,19 +7,29 @@ import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.bean.BannerImage;
 import com.xxm.mmd.wxfx.bean.CirlceBean;
 import com.xxm.mmd.wxfx.bean.DataWx;
+import com.xxm.mmd.wxfx.bean.FCode;
+import com.xxm.mmd.wxfx.bean.HomePage;
+import com.xxm.mmd.wxfx.bean.OrderBean;
 import com.xxm.mmd.wxfx.bean.Team;
 import com.xxm.mmd.wxfx.bean.UpdateSys;
 import com.xxm.mmd.wxfx.bean.UserBean;
 import com.xxm.mmd.wxfx.ui.UpdateActivity;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import c.b.BP;
+import c.b.PListener;
+import c.b.QListener;
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.BmobSMS;
 import cn.bmob.v3.BmobUser;
+import cn.bmob.v3.datatype.BmobDate;
 import cn.bmob.v3.datatype.BmobFile;
 import cn.bmob.v3.datatype.BmobPointer;
 import cn.bmob.v3.exception.BmobException;
@@ -33,6 +43,8 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 
 /**
@@ -335,6 +347,7 @@ public class BmobUtils {
                 }
                 Team team = new Team();
                 team.setAdminUser(user);
+                team.setAdminId(user.getObjectId());
                 team.setName(teamName);
                 team.save(new SaveListener<String>() {
                     @Override
@@ -410,6 +423,154 @@ public class BmobUtils {
         });
     }
 
+    public static Observable<HomePage> getMyHomePage() {
+        return Observable.create(new ObservableOnSubscribe<HomePage>() {
+            @Override
+            public void subscribe(final ObservableEmitter<HomePage> emitter) throws Exception {
+                BmobQuery<HomePage> query = new BmobQuery<>();
+                query.addWhereEqualTo("user", new BmobPointer(MyApp.getApp().getUser()));
+                query.findObjects(new FindListener<HomePage>() {
+                    @Override
+                    public void done(List<HomePage> list, BmobException e) {
+                        if (e == null) {
+                            if (list.size() != 0) {
+                                emitter.onNext(list.get(0));
+                                emitter.onComplete();
+                            }
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<List<HomePage>> findHomeBean(final int pageSize, final int pageNo) {
+        return Observable.create(new ObservableOnSubscribe<List<HomePage>>() {
+            @Override
+            public void subscribe(final ObservableEmitter<List<HomePage>> emitter) throws Exception {
+                BmobQuery<HomePage> query = new BmobQuery<>();
+                query.include("user");
+                query.order("-createdAt");
+                query.setLimit(pageSize).setSkip(pageNo*pageSize)
+                        .findObjects(new FindListener<HomePage>() {
+                            @Override
+                            public void done(List<HomePage> list, BmobException e) {
+                                if (e == null) {
+                                    emitter.onNext(list);
+                                    emitter.onComplete();
+                                }else {
+                                    emitter.onError(e);
+                                }
+                            }
+                        });
+            }
+        });
+    }
+
+    public static Observable<String> putHomePage(final String objectId, final List<String> images, final String cardName, final String cardInfo, final String cardWx, final String cardphone) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                if (images.size() != 0) {
+                    String[] s = new String[images.size()];
+                    images.toArray(s);
+                    uploadFiles(s)
+                            .subscribe(new Observer<List<String>>() {
+                                @Override
+                                public void onSubscribe(Disposable d) {
+
+                                }
+
+                                @Override
+                                public void onNext(List<String> strings) {
+                                    HomePage page = new HomePage();
+                                    page.setImages(strings);
+                                    page.setCardName(cardName);
+                                    page.setCardInfo(cardInfo);
+                                    page.setWxInfo(cardWx);
+                                    page.setPhoneNum(cardphone);
+                                    page.setUser(MyApp.getApp().getUser());
+
+                                    if (TextUtils.isEmpty(objectId)) {
+
+                                        page.save(new SaveListener<String>() {
+                                            @Override
+                                            public void done(String s, BmobException e) {
+                                                if (e == null) {
+                                                    emitter.onNext(s);
+                                                    emitter.onComplete();
+                                                }else {
+                                                    emitter.onError(e);
+                                                }
+                                            }
+                                        });
+                                    }else {
+                                        page.update(objectId, new UpdateListener() {
+                                            @Override
+                                            public void done(BmobException e) {
+                                                if (e == null) {
+                                                    emitter.onNext("成功");
+                                                    emitter.onComplete();
+                                                }else {
+                                                    emitter.onError(e);
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    emitter.onError(e);
+                                }
+
+                                @Override
+                                public void onComplete() {
+
+                                }
+                            });
+                }else {
+                    HomePage page = new HomePage();
+//                    page.setImages(strings);
+                    page.setCardName(cardName);
+                    page.setCardInfo(cardInfo);
+                    page.setWxInfo(cardWx);
+                    page.setPhoneNum(cardphone);
+                    page.setUser(MyApp.getApp().getUser());
+                    if (TextUtils.isEmpty(objectId)) {
+
+                        page.save(new SaveListener<String>() {
+                            @Override
+                            public void done(String s, BmobException e) {
+                                if (e == null) {
+                                    emitter.onNext(s);
+                                    emitter.onComplete();
+                                }else {
+                                    emitter.onError(e);
+                                }
+                            }
+                        });
+                    }else {
+                        page.update(objectId, new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                if (e == null) {
+                                    emitter.onNext("成功");
+                                    emitter.onComplete();
+                                }else {
+                                    emitter.onError(e);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
     public static Observable<List<UserBean>> findTeamUsers(final Team team, final int pageSize, final int pageNo) {
         return Observable.create(new ObservableOnSubscribe<List<UserBean>>() {
             @Override
@@ -442,6 +603,7 @@ public class BmobUtils {
                 UserBean userBean = new UserBean();
                 userBean.setUsername(userName);
                 userBean.setPassword(password);
+                userBean.setName(userName);
                 userBean.signUp(new SaveListener<UserBean>() {
                     @Override
                     public void done(UserBean userBean, BmobException e) {
@@ -493,7 +655,7 @@ public class BmobUtils {
             bean.setTime(dataWx.getCreatedAt());
             if (dataWx.getUser() != null) {
                 bean.setAvatarUrl(dataWx.getUser().getUseravatar());
-                bean.setUserName(dataWx.getUser().getUsername());
+                bean.setUserName(dataWx.getUser().getName());
 //                                Log.d(TAG, dataWx.getUser().getMobilePhoneNumber() + "");
             }
             cirlceBeanList.add(bean);
@@ -543,6 +705,146 @@ public class BmobUtils {
                         }else {
                             emitter.onError(e);
                         }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<String> activateVip(final int vipnum) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                UserBean userBean = new UserBean();
+                userBean.setVip(vipnum);
+                BmobDate date = new BmobDate(getDateStr(31));
+                userBean.setVipdate(date);
+                userBean.update(MyApp.getApp().getUser().getObjectId(), new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e == null) {
+                            emitter.onNext("成功");
+                            emitter.onComplete();
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Date getDateStr( long dayAddNum) {
+        Date nowDate = new Date(System.currentTimeMillis());
+        Date newDate2 = new Date(nowDate.getTime() + dayAddNum * 24 * 60 * 60 * 1000);
+        return newDate2;
+    }
+
+    public static Observable<String> deleFcode(final FCode fCode) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                fCode.setTrue(false);
+                fCode.update(new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+                        if (e == null) {
+                            emitter.onNext("成功");
+                            emitter.onComplete();
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<FCode> getFCodeToNet(final String fcode) {
+        return Observable.create(new ObservableOnSubscribe<FCode>() {
+            @Override
+            public void subscribe(final ObservableEmitter<FCode> emitter) throws Exception {
+                BmobQuery<FCode> query = new BmobQuery<>();
+                query.addWhereEqualTo("FCode", fcode);
+                query.findObjects(new FindListener<FCode>() {
+                    @Override
+                    public void done(List<FCode> list, BmobException e) {
+                        if (e == null&&list.size()!=0) {
+                            emitter.onNext(list.get(0));
+                            emitter.onComplete();
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<String> BmobPay(final int payType, final String name, final String body, final double price) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                BP.pay(name, body, price, payType, new PListener() {
+                    @Override
+                    public void orderId(String s) {
+                        emitter.onNext("订单号:"+s);
+                        putOrder(s)
+                        .subscribe();
+                    }
+
+                    @Override
+                    public void succeed() {
+                        emitter.onNext("支付成功");
+                        emitter.onComplete();
+                    }
+
+                    @Override
+                    public void fail(int i, String s) {
+                        emitter.onNext("支付失败：code "+ i +" msg "+s);
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<String> putOrder(final String orderid) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                OrderBean orderBean = new OrderBean();
+                orderBean.setUser(MyApp.getApp().getUser());
+                orderBean.setOrderid(orderid);
+                orderBean.save(new SaveListener<String>() {
+                    @Override
+                    public void done(String s, BmobException e) {
+                        if (e == null) {
+                            emitter.onNext(s);
+                            emitter.onComplete();
+                        }else {
+                            emitter.onError(e);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static Observable<String> BmobPayQuery(final String orderID) {
+        return Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final ObservableEmitter<String> emitter) throws Exception {
+                BP.query(orderID, new QListener() {
+                    @Override
+                    public void succeed(String s) {
+                        Log.d("BmobUtils", s);
+                        emitter.onNext(s);
+                        emitter.onComplete();
+                    }
+
+                    @Override
+                    public void fail(int i, String s) {
+                        emitter.onError(new Exception("i:"+i+" msg:"+s));
                     }
                 });
             }

@@ -1,6 +1,7 @@
 package com.xxm.mmd.wxfx.adapter;
 
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 

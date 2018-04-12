@@ -21,6 +21,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <application
         android:name=".MyApp"
@@ -116,7 +118,30 @@
             android:name=".ui.MyCircleActivity"
             android:label="@string/title_activity_my_circle"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ui.Login2Activity"></activity>
+        <activity android:name=".ui.Login2Activity" />
+        <activity android:name=".ui.PhoneActivity" />
+        <activity
+            android:name=".ui.AddFriendActivity"
+            android:label="@string/title_activity_add_friend"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.AddFriendPhoneActivity"
+            android:label="@string/title_activity_add_friend_phone"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.AutoLikeActivity"
+            android:label="@string/title_activity_auto_like"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.EditUserInfoActivity"
+            android:label="@string/title_activity_edit_user_info"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.VipActivity"
+            android:label="@string/title_activity_vip"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ui.FCodeActivity" />
+        <activity android:name=".ui.EditHomeActivity"></activity>
     </application>
 
 </manifest>

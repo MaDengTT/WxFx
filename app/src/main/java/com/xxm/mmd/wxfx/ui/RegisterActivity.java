@@ -14,6 +14,8 @@ import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.bean.UserBean;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -59,6 +61,8 @@ public class RegisterActivity extends BaseActivity {
                     public void accept(UserBean userBean) throws Exception {
                         if (userBean != null) {
                             Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
+                            EventBus.getDefault().post(new UserBean());
+                            finish();
                         }
                     }
                 }, new Consumer<Throwable>() {

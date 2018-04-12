@@ -143,8 +143,8 @@ public class WeiXinShareUtil {
 
     @SuppressLint("CheckResult")
     public static void shareDataToWx(String id, final Activity activity) {
-        String ids = SysUtils.getStringID(id);
-        BmobUtils.loadDataToBmob(ids)
+
+        BmobUtils.loadDataToBmob(id)
                 .flatMap(new Function<DataWx, ObservableSource<DataWx>>() {
                     @Override
                     public ObservableSource<DataWx> apply(final DataWx wx) throws Exception {
@@ -209,5 +209,20 @@ public class WeiXinShareUtil {
                         Log.e("tt", "accept: ",throwable );
                     }
                 });
+    }
+
+
+    public static  void openAppWx(Context context) {
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            Intent intent = new Intent();
+            intent = packageManager.getLaunchIntentForPackage("com.tencent.mm");
+            context.startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Intent viewIntent = new
+                    Intent("android.intent.action.VIEW", Uri.parse("http://weixin.qq.com/"));
+            context.startActivity(viewIntent);
+        }
     }
 }
