@@ -76,6 +76,7 @@ public class MultiImageView extends LinearLayout {
         }
 
         initView();
+        postInvalidate();
     }
 
     @Override

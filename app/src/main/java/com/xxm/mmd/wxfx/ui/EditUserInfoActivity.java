@@ -28,6 +28,7 @@ import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.bean.UserBean;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
 import com.xxm.mmd.wxfx.utils.GlideLoader;
+import com.xxm.mmd.wxfx.utils.WaitObserver;
 import com.xxm.mmd.wxfx.view.RCRelativeLayout;
 
 import org.greenrobot.eventbus.EventBus;
@@ -131,6 +132,8 @@ public class EditUserInfoActivity extends AppCompatActivity {
     }
 
     private void initView() {
+
+        tvTitle.setText("个人信息");
 
         user = MyApp.getApp().getUser();
         com.xxm.mmd.wxfx.glide.GlideLoader.loadAvatar(ivAvatar, user.getUseravatar());
@@ -247,11 +250,7 @@ public class EditUserInfoActivity extends AppCompatActivity {
                                     });
                                 }
                             })
-                            .subscribe(new Observer<String>() {
-                                @Override
-                                public void onSubscribe(Disposable d) {
-
-                                }
+                            .subscribe(new WaitObserver<String>(EditUserInfoActivity.this,"") {
 
                                 @Override
                                 public void onNext(String s) {
@@ -260,12 +259,13 @@ public class EditUserInfoActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onError(Throwable e) {
-                                    Log.e("aa", "onError: ", e);
+                                    super.onError(e);
                                     Toast.makeText(EditUserInfoActivity.this, "更新失败", Toast.LENGTH_SHORT).show();
                                 }
 
                                 @Override
                                 public void onComplete() {
+                                    super.onComplete();
                                     EventBus.getDefault().post(new UserBean());
                                     finish();
                                 }

@@ -37,4 +37,14 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="but_bg_shape">
+        <item name="android:shadowColor">#EDFA2B</item>
+        <item name="android:shadowDx">2</item>
+        <item name="android:shadowDy">-1</item>
+        <item name="android:shadowRadius">12</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/but_bg_share</item>
+    </style>
+
 </resources>

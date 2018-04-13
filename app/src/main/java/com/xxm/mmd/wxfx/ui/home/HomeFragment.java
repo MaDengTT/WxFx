@@ -3,7 +3,9 @@ package com.xxm.mmd.wxfx.ui.home;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.service.autofill.Dataset;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.loadmore.SimpleLoadMoreView;
 import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.UserCardAdapter;
@@ -23,6 +26,7 @@ import com.xxm.mmd.wxfx.contast.Contast;
 import com.xxm.mmd.wxfx.glide.BannerGlideLoader;
 import com.xxm.mmd.wxfx.ui.BaseFrament;
 import com.xxm.mmd.wxfx.ui.EditHomeActivity;
+import com.xxm.mmd.wxfx.ui.HomeCardActivity;
 import com.xxm.mmd.wxfx.ui.Login2Activity;
 import com.xxm.mmd.wxfx.ui.MainActivity;
 import com.xxm.mmd.wxfx.ui.UpdateActivity;
@@ -52,6 +56,8 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
     Unbinder unbinder;
     @BindView(R.id.fab)
     FloatingActionButton fab;
+    @BindView(R.id.srl)
+    SwipeRefreshLayout srl;
     private CardView cvUpdate, cvScan;
 
     ProgressDialog dialog;
@@ -106,28 +112,34 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
     private void initData() {
 
         BmobUtils.findHomeBean(pageSize, pageNo)
-        .subscribe(new Observer<List<HomePage>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                waitDialog.show();
-            }
+                .subscribe(new Observer<List<HomePage>>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        waitDialog.show();
+                    }
 
-            @Override
-            public void onNext(List<HomePage> homePages) {
-                setData(homePages);
-            }
+                    @Override
+                    public void onNext(List<HomePage> homePages) {
+                        setData(homePages);
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                Log.e(TAG, "onError: ",e );
-                waitDialog.dismiss();
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e(TAG, "onError: ", e);
+                        waitDialog.dismiss();
+                        if (srl.isRefreshing()) {
+                            srl.setRefreshing(false);
+                        }
+                    }
 
-            @Override
-            public void onComplete() {
-                waitDialog.dismiss();
-            }
-        });
+                    @Override
+                    public void onComplete() {
+                        waitDialog.dismiss();
+                        if (srl.isRefreshing()) {
+                            srl.setRefreshing(false);
+                        }
+                    }
+                });
 
 
     }
@@ -135,7 +147,18 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
     private static final String TAG = "HomeFragment";
 
     private void setData(List<HomePage> data) {
-        adapter.setNewData(data);
+        if (pageNo == 0) {
+            adapter.setNewData(data);
+        }else {
+            adapter.addData(data);
+        }
+
+        if (data.size() == pageSize) {
+            adapter.loadMoreComplete();
+            pageNo++;
+        }else {
+            adapter.loadMoreEnd();
+        }
     }
 
 
@@ -182,14 +205,29 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
 
         waitDialog = DialogHelp.getWaitDialog(getActivity(), "请稍后");
 
-        viewTop = getLayoutInflater().inflate(R.layout.home_top, null,false);
+        viewTop = getLayoutInflater().inflate(R.layout.home_top, null, false);
 
+        srl.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                pageNo = 0;
+                initData();
+            }
+        });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setNestedScrollingEnabled(false);
         adapter = new UserCardAdapter(null);
         adapter.addHeaderView(viewTop);
+        adapter.setLoadMoreView(new SimpleLoadMoreView());
+        adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                initData();
+            }
+        },recyclerView);
         recyclerView.setAdapter(adapter);
+
 
 //        ivBanner = view.findViewById(R.id.iv_banner);
 
@@ -206,6 +244,14 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
         cvScan.setOnClickListener(this);
         cvUpdate.setOnClickListener(this);
 
+        adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                HomePage page = ((HomePage) adapter.getItem(position));
+                HomeCardActivity.start(getActivity(), page);
+            }
+        });
+
         adapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
@@ -217,7 +263,7 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
                             Intent intent = new Intent();
                             intent.setAction(Contast.accessBroad);
                             intent.putExtra(Contast.BroadType, Contast.addFriendText);
-                            intent.putExtra(Contast.BroadNameID, ((HomePage)adapter.getItem(position)).getWxInfo());
+                            intent.putExtra(Contast.BroadNameID, ((HomePage) adapter.getItem(position)).getWxInfo());
                             getActivity().sendBroadcast(intent);
                         }
                         break;
@@ -273,7 +319,7 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
         if (MyApp.getApp().getUser() == null) {
             Toast.makeText(getActivity(), "请登录", Toast.LENGTH_SHORT).show();
             Login2Activity.start(getActivity());
-        }else {
+        } else {
             EditHomeActivity.start(getActivity());
         }
     }

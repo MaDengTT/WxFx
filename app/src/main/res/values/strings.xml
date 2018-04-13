@@ -104,4 +104,6 @@
     <string name="title_activity_auto_like">AutoLikeActivity</string>
     <string name="title_activity_edit_user_info">EditUserInfoActivity</string>
     <string name="title_activity_vip">VipActivity</string>
+    <string name="yonhu"><![CDATA[<用户协议>]]></string>
+    <string name="title_activity_home_card">HomeCardActivity</string>
 </resources>

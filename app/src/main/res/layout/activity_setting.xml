@@ -105,7 +105,8 @@
     <Button
         android:layout_marginTop="32dp"
         android:id="@+id/loginout"
-        android:text="退出登陆"
+        android:text="退出登录"
+        style="@style/but_bg_shape"
         android:paddingBottom="8dp"
         android:paddingTop="8dp"
         android:layout_marginRight="16dp"

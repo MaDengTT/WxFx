@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white_Fa"
     tools:context=".ui.RegisterActivity">
 
     <RelativeLayout
@@ -20,35 +21,81 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
         android:layout_marginRight="32dp"
-        android:background="@drawable/ba_edittext"
+        android:background="@null"
+        android:hint="手机号码"
         android:padding="8dp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.25"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.376" />
-    <EditText
-        android:inputType="textPassword"
-        android:layout_marginTop="16dp"
-        android:id="@+id/ed_password"
-        android:background="@drawable/ba_edittext"
-        android:padding="8dp"
+        app:layout_constraintVertical_bias="0.3" />
+    <View
+        android:layout_marginTop="4dp"
         app:layout_constraintLeft_toLeftOf="@+id/ed_phone"
-        app:layout_constraintRight_toRightOf="@+id/ed_phone"
+        app:layout_constraintRight_toRightOf="@id/ed_phone"
         app:layout_constraintTop_toBottomOf="@+id/ed_phone"
         android:layout_width="0dp"
-        android:layout_height="wrap_content" />
+        android:layout_height="1dp"
+        android:background="@color/background" />
+
+    <EditText
+        android:id="@+id/ed_password"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@null"
+        android:hint="密码"
+        android:inputType="textPassword"
+        android:padding="8dp"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="@+id/ed_phone"
+        app:layout_constraintRight_toRightOf="@+id/ed_phone"
+        app:layout_constraintTop_toBottomOf="@+id/ed_phone" />
+    <View
+        android:layout_marginTop="4dp"
+        app:layout_constraintLeft_toLeftOf="@+id/ed_password"
+        app:layout_constraintRight_toRightOf="@id/ed_password"
+        app:layout_constraintTop_toBottomOf="@+id/ed_password"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/background" />
 
     <Button
         android:id="@+id/but_regist"
+        style="@style/but_bg_shape"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="96dp"
+        android:text="注册"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ed_password" />
+
+    <TextView
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
-        android:text="注册"
-        app:layout_constraintEnd_toEndOf="@+id/ed_phone"
-        app:layout_constraintStart_toStartOf="@+id/ed_phone"
-        app:layout_constraintTop_toBottomOf="@+id/ed_password" />
+        android:text="点击注册，表示同意"
+        android:textColor="@color/colorDefault"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/but_regist"
+        app:layout_constraintStart_toStartOf="@+id/but_regist" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="@string/yonhu"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView2"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="@+id/textView2" />
 
 </android.support.constraint.ConstraintLayout>

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.widget.AppCompatEditText;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,7 +29,7 @@ public class Login2Activity extends BaseActivity {
     @BindView(R.id.ed_login_password)
     AppCompatEditText edLoginPassword;
     @BindView(R.id.tv_login)
-    TextView tvLogin;
+    Button tvLogin;
     @BindView(R.id.tv_send)
     TextView tvSend;
 
@@ -51,23 +52,19 @@ public class Login2Activity extends BaseActivity {
     }
 
     private void initView() {
-        tvSend.setText("注册");
-        tvSend.setVisibility(View.VISIBLE);
-        tvSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                RegisterActivity.start(Login2Activity.this);
-            }
-        });
+        setTitleName("登录");
     }
 
-    @OnClick({R.id.ed_login_password, R.id.tv_login})
+    @OnClick({R.id.ed_login_password, R.id.tv_login,R.id.tv_regist})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.ed_login_password:
                 break;
             case R.id.tv_login:
                 login(edLoginName.getText().toString(), edLoginPassword.getText().toString());
+                break;
+            case R.id.tv_regist:
+                RegisterActivity.start(Login2Activity.this);
                 break;
         }
     }

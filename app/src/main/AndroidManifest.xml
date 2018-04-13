@@ -32,7 +32,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".ui.MainActivity">
+        <activity android:name=".ui.MainActivity"
+            android:launchMode="singleTask"
+            >
 
             <!--
                 <intent-filter>
@@ -141,7 +143,11 @@
             android:label="@string/title_activity_vip"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".ui.FCodeActivity" />
-        <activity android:name=".ui.EditHomeActivity"></activity>
+        <activity android:name=".ui.EditHomeActivity" />
+        <activity
+            android:name=".ui.HomeCardActivity"
+            android:label="@string/title_activity_home_card"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

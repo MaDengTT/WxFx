@@ -22,6 +22,7 @@ import com.xxm.mmd.wxfx.adapter.CircleAdapter;
 import com.xxm.mmd.wxfx.bean.CirlceBean;
 import com.xxm.mmd.wxfx.bean.DataWx;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
+import com.xxm.mmd.wxfx.utils.WaitObserver;
 import com.xxm.mmd.wxfx.utils.WeiXinShareUtil;
 
 import java.util.ArrayList;
@@ -113,15 +114,16 @@ public class MyCircleActivity extends BaseActivity {
                 CirlceBean item = (CirlceBean) adapter.getItem(position);
                 switch (view.getId()) {
                     case R.id.tv_del:
-                        BmobUtils.removeDataWx(item.getObjeId()).subscribe(new Consumer<String>() {
+                        BmobUtils.removeDataWx(item.getObjeId()).subscribe(new WaitObserver<String>(MyCircleActivity.this, "") {
+
                             @Override
-                            public void accept(String s) throws Exception {
+                            public void onNext(String s) {
                                 adapter.remove(position);
                             }
-                        }, new Consumer<Throwable>() {
+
                             @Override
-                            public void accept(Throwable throwable) throws Exception {
-                                Log.e("accept", "accept: ",throwable );
+                            public void onError(Throwable e) {
+                                super.onError(e);
                                 Toast.makeText(MyCircleActivity.this, "删除失败", Toast.LENGTH_SHORT).show();
                             }
                         });

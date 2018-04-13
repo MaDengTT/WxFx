@@ -604,6 +604,7 @@ public class BmobUtils {
                 userBean.setUsername(userName);
                 userBean.setPassword(password);
                 userBean.setName(userName);
+                userBean.setVip(0);
                 userBean.signUp(new SaveListener<UserBean>() {
                     @Override
                     public void done(UserBean userBean, BmobException e) {

@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.bean.UserBean;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
+import com.xxm.mmd.wxfx.utils.WaitObserver;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -56,19 +57,21 @@ public class RegisterActivity extends BaseActivity {
     @OnClick(R.id.but_regist)
     public void onViewClicked() {
         BmobUtils.registUser(edPhone.getText().toString(),edPassword.getText().toString())
-                .subscribe(new Consumer<UserBean>() {
+                .subscribe(new WaitObserver<UserBean>(this,"") {
                     @Override
-                    public void accept(UserBean userBean) throws Exception {
+                    public void onNext(UserBean userBean) {
                         if (userBean != null) {
                             Toast.makeText(RegisterActivity.this, "注册成功", Toast.LENGTH_SHORT).show();
                             EventBus.getDefault().post(new UserBean());
+                            Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                            startActivity(intent);
                             finish();
                         }
                     }
-                }, new Consumer<Throwable>() {
+
                     @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        Log.e(TAG, "accept: ",throwable );
+                    public void onError(Throwable e) {
+                        super.onError(e);
                         Toast.makeText(RegisterActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
                     }
                 });

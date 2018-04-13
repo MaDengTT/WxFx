@@ -136,17 +136,20 @@ public class MyFragment extends Fragment {
         }else{
             String name = MyApp.getApp().getUser().getName();
             tvUserName.setText(TextUtils.isEmpty(name)?MyApp.getApp().getUser().getUsername():name);
-            switch (MyApp.getApp().getUser().getVip()) {
-                case 0:
-                    tvUserInfo.setText("普通用户");
-                    break;
+            if (MyApp.getApp().getUser().getVip() != null) {
+                switch (MyApp.getApp().getUser().getVip()) {
+                    case 0:
+                        tvUserInfo.setText("普通用户");
+                        break;
                     case 1:
-                    tvUserInfo.setText("Vip会员");
-                    break;
+                        tvUserInfo.setText("Vip会员");
+                        break;
                     case 2:
-                    tvUserInfo.setText("团队Vip会员");
-                    break;
+                        tvUserInfo.setText("团队Vip会员");
+                        break;
+                }
             }
+
 
             GlideLoader.loadAvatar(ivAvatar,MyApp.getApp().getUser().getUseravatar());
             tvUserInfo.setOnClickListener(new View.OnClickListener() {

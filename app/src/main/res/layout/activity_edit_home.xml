@@ -174,8 +174,11 @@
                 android:background="@color/background" />
 
             <Button
+                style="@style/but_bg_shape"
                 android:id="@+id/but_send"
                 android:layout_marginTop="8dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginLeft="32dp"
                 android:text="发布名片"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
