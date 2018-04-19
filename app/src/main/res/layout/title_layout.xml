@@ -5,6 +5,17 @@
     android:background="@color/colorPrimary"
     android:layout_height="50dp">
 
+    <ImageView
+        android:src="@drawable/ic_arrow_back_black"
+        app:layout_constraintDimensionRatio="1:1"
+        android:id="@+id/iv_title_back"
+        android:layout_width="wrap_content"
+        android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_height="0dp" />
+
     <TextView
         android:id="@+id/tv_title"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -410,7 +410,11 @@ public class BmobUtils {
                         public void done(UserBean userBean, BmobException e) {
                             if (e == null) {
                                 MyApp.getApp().setTeam(userBean.getTeam());
-                                emitter.onNext(userBean.getTeam());
+                                if (userBean.getTeam() == null) {
+                                    emitter.onNext(new Team());
+                                }else {
+                                    emitter.onNext(userBean.getTeam());
+                                }
                                 emitter.onComplete();
                             }else {
                                 emitter.onError(e);
@@ -435,6 +439,9 @@ public class BmobUtils {
                         if (e == null) {
                             if (list.size() != 0) {
                                 emitter.onNext(list.get(0));
+                                emitter.onComplete();
+                            }else {
+                                emitter.onNext(new HomePage());
                                 emitter.onComplete();
                             }
                         }else {
@@ -789,7 +796,7 @@ public class BmobUtils {
                 BP.pay(name, body, price, payType, new PListener() {
                     @Override
                     public void orderId(String s) {
-                        emitter.onNext("订单号:"+s);
+//                        emitter.onNext("订单号:"+s);
                         putOrder(s)
                         .subscribe();
                     }
@@ -802,7 +809,7 @@ public class BmobUtils {
 
                     @Override
                     public void fail(int i, String s) {
-                        emitter.onNext("支付失败：code "+ i +" msg "+s);
+                        emitter.onError(new Throwable("支付失败：code "+ i +" msg "+s));
                     }
                 });
             }

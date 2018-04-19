@@ -24,7 +24,7 @@ public class ServiceHelper {
     public static void startAccessibilityService(final Context context) {
         new AlertDialog.Builder(context)
                 .setTitle("开启辅助功能")
-                .setIcon(R.mipmap.ic_launcher)
+                .setIcon(R.mipmap.ic_launcher_round)
                 .setMessage("使用此项功能需要您开启辅助功能")
                 .setPositiveButton("立即开启", new DialogInterface.OnClickListener() {
                     @Override

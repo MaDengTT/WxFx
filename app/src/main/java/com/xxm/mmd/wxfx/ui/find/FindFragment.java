@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.xxm.mmd.wxfx.R;
@@ -31,6 +32,8 @@ public class FindFragment extends BaseFrament {
     TabLayout tabLayout;
     @BindView(R.id.tv_title)
     TextView tvTitle;
+    @BindView(R.id.iv_title_back)
+    ImageView ivTitleBack;
     private CircleAdapter adapter;
 
     public FindFragment() {
@@ -56,7 +59,8 @@ public class FindFragment extends BaseFrament {
     }
 
     private void initView() {
-        setTitleName(tvTitle,"发现");
+        ivTitleBack.setVisibility(View.GONE);
+        setTitleName(tvTitle, "发现");
         viewPage.setAdapter(new FindFragmentAdapter(getChildFragmentManager()));
         tabLayout.setupWithViewPager(viewPage);
     }

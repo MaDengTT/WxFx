@@ -10,9 +10,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,28 +22,31 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.lljjcoder.Interface.OnCityItemClickListener;
+import com.lljjcoder.bean.CityBean;
+import com.lljjcoder.bean.DistrictBean;
+import com.lljjcoder.bean.ProvinceBean;
+import com.lljjcoder.citywheel.CityConfig;
+import com.lljjcoder.style.citypickerview.CityPickerView;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.PhoneAdapter;
 import com.xxm.mmd.wxfx.daoman.bean.CityPhoneBean;
 import com.xxm.mmd.wxfx.daoman.dao.CityPhoneDao;
 import com.xxm.mmd.wxfx.utils.PrefUtils;
+import com.xxm.mmd.wxfx.utils.WaitObserver;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
-import io.reactivex.Scheduler;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.internal.schedulers.IoScheduler;
 import io.reactivex.schedulers.Schedulers;
 
 public class PhoneActivity extends BaseActivity {
@@ -76,8 +79,12 @@ public class PhoneActivity extends BaseActivity {
     Button butPutBook;
     @BindView(R.id.but_clearBook)
     Button butClearBook;
+    @BindView(R.id.tv_empty)
+    TextView tvEmpty;
     private List<String> phoneNumber = new ArrayList<>();
     private PhoneAdapter phoneAdapter;
+
+    CityPickerView mPicker = new CityPickerView();
 
     public static void start(Context context) {
         Intent starter = new Intent(context, PhoneActivity.class);
@@ -93,6 +100,7 @@ public class PhoneActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
+        mPicker.init(this);
         initView();
     }
 
@@ -115,9 +123,15 @@ public class PhoneActivity extends BaseActivity {
                 }
             }
         });
-        PrefUtils.putString(PhoneActivity.this,"phone_opera","移动");
-        PrefUtils.putString(PhoneActivity.this, "phone_area", "郑州");
-        recycler.setLayoutManager(new GridLayoutManager(getBaseContext(),2));
+        PrefUtils.putString(PhoneActivity.this, "phone_opera", "移动");
+        String phone_area = PrefUtils.getString(PhoneActivity.this, "phone_area", null);
+        if (!TextUtils.isEmpty(phone_area)) {
+            tvAddressInfo.setText(phone_area);
+        } else {
+            tvAddressInfo.setText("郑州市");
+            PrefUtils.putString(PhoneActivity.this, "phone_area", "郑州");
+        }
+        recycler.setLayoutManager(new GridLayoutManager(getBaseContext(), 2));
         phoneAdapter = new PhoneAdapter(null);
         recycler.setAdapter(phoneAdapter);
     }
@@ -126,12 +140,29 @@ public class PhoneActivity extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.tv_address_info:
+                CityConfig cityConfig = new CityConfig.Builder().setCityWheelType(CityConfig.WheelType.PRO_CITY).build();
+
+                mPicker.setConfig(cityConfig);
+                mPicker.setOnCityItemClickListener(new OnCityItemClickListener() {
+                    @Override
+                    public void onSelected(ProvinceBean province, CityBean city, DistrictBean district) {
+                        super.onSelected(province, city, district);
+                        if (!TextUtils.isEmpty(city.getName())) {
+                            tvAddressInfo.setText(city.getName());
+                            PrefUtils.putString(PhoneActivity.this, "phone_area", city.getName().substring(0, city.getName().length() - 1));
+                            Log.d("PhoneActivity", PrefUtils.getString(PhoneActivity.this, "phone_area", null));
+
+                        }
+                    }
+                });
+                mPicker.showCityPicker();
                 break;
             case R.id.but_create:
                 createPhone();
                 break;
             case R.id.but_putBook:
-                io.reactivex.Observable.just(phoneNumber)
+
+                Observable.just(phoneNumber)
                         .map(new Function<List<String>, String>() {
                             @Override
                             public String apply(List<String> strings) throws Exception {
@@ -139,26 +170,19 @@ public class PhoneActivity extends BaseActivity {
                                 return "";
                             }
                         })
-                        .doOnSubscribe(new Consumer<Disposable>() {
-                            @Override
-                            public void accept(Disposable disposable) throws Exception {
-                                Log.d("PhoneActivity", "开始");
-                            }
-                        })
-                        .doOnTerminate(new Action() {
-                            @Override
-                            public void run() throws Exception {
-                                Log.d("PhoneActivity", "结束");
-                            }
-                        })
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .observeOn(Schedulers.io())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .observeOn(Schedulers.io())
 
-                .subscribe();
+                        .subscribe(new WaitObserver<String>(this, "") {
+                            @Override
+                            public void onNext(String s) {
+
+                            }
+                        });
 
                 break;
             case R.id.but_clearBook:
-                io.reactivex.Observable.just(phoneNumber)
+                Observable.just(phoneNumber)
                         .map(new Function<List<String>, String>() {
                             @Override
                             public String apply(List<String> strings) throws Exception {
@@ -181,13 +205,19 @@ public class PhoneActivity extends BaseActivity {
                         .subscribeOn(AndroidSchedulers.mainThread())
                         .observeOn(Schedulers.io())
 
-                        .subscribe();
+                        .subscribe(new WaitObserver<String>(this, "") {
+                            @Override
+                            public void onNext(String s) {
+
+                            }
+                        });
 
                 break;
         }
     }
 
     public void createPhone() {
+        phoneNumber.clear();
         CityPhoneDao cityPhoneDao = new CityPhoneDao(this);
         List<CityPhoneBean> all = cityPhoneDao.findAll();
 
@@ -195,8 +225,8 @@ public class PhoneActivity extends BaseActivity {
             Log.d("PhoneActivity", "all.size():" + all.size());
         }
 
-        for(int i=0;i<all.size();i++) {
-            for (int j = 0;j<5;j++) {
+        for (int i = 0; i < all.size(); i++) {
+            for (int j = 0; j < 5; j++) {
                 String phone = all.get(i).getName() + (int) (Math.random() * 9000 + 1000);
                 Log.d("PhoneActivity", phone);
                 phoneNumber.add(phone);
@@ -204,6 +234,7 @@ public class PhoneActivity extends BaseActivity {
         }
 
         phoneAdapter.setNewData(phoneNumber);
+        tvEmpty.setVisibility(View.GONE);
     }
 
     /**
@@ -222,7 +253,7 @@ public class PhoneActivity extends BaseActivity {
                 // 循环
                 while (cursor.moveToNext()) {
                     String name = cursor
-                            .getString(cursor.getColumnIndex(android.provider.ContactsContract.Contacts.DISPLAY_NAME));
+                            .getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
                     // 根据姓名求id
                     Uri uri = Uri.parse("content://com.android.contacts/raw_contacts");
 
@@ -295,5 +326,6 @@ public class PhoneActivity extends BaseActivity {
             e.printStackTrace();
         }
     }
+
 
 }

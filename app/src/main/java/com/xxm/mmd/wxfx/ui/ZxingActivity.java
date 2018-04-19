@@ -45,6 +45,7 @@ public class ZxingActivity extends BaseActivity {
 
 
     public static int TEAM_ = 0x4532;
+    public static int NOT_TEAM = 0x4539;
     public static String TEAM_S = "teams";
 
     boolean ifTeam = false;

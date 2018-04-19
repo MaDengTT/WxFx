@@ -6,14 +6,15 @@ android {
         applicationId "com.xxm.mmd.wxfx"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 120180327
-        versionName "1.1"
+        versionCode 120180417
+        versionName "1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         manifestPlaceholders = [
                 JPUSH_APPKEY : "b34f9e30e62226a722044f89", //JPush上注册的包名对应的appkey.
                 JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
         ]
+        multiDexEnabled true
 
     }
     buildTypes {
@@ -21,6 +22,7 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
     }
     defaultConfig {
         // 指定支持的so架构
@@ -35,6 +37,7 @@ repositories {
         dirs 'libs'
     }
 }
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //noinspection GradleCompatible
@@ -47,6 +50,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    //    implementation ('liji.library.dev:citypickerview:3.1.6'){
+    //        exclude group: 'com.google.gson.ExclusionStrategy'
+    //    }
     implementation 'cn.bmob.android:bmob-sdk:3.5.5'
     implementation 'cn.bmob.android:http-legacy:1.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.8'
@@ -75,4 +81,6 @@ dependencies {
     annotationProcessor 'com.google.dagger:dagger-compiler:2.15'
     implementation 'com.bm.photoview:library:1.4.1'
     implementation files('libs/BmobPay_v3.2.3_171113.jar')
+    implementation project(':citypickerview')
+    implementation 'com.android.support:multidex:1.0.3'
 }

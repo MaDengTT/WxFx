@@ -4,6 +4,8 @@ import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -16,6 +18,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Toast;
 
+import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.contast.Contast;
 import com.xxm.mmd.wxfx.service.content.Constant;
 import com.xxm.mmd.wxfx.service.content.IDConstant;
@@ -179,6 +182,8 @@ public class MyService extends AccessibilityService {
                             }
                         }
 
+
+//                        performSerachToMain();
                     } else if (wxPage == 2) {
                         performNode("添加朋友");
                     } else if (wxPage == 3) {
@@ -192,12 +197,12 @@ public class MyService extends AccessibilityService {
                         }
 
                         if (!addNewFriendPutText) {
-                            AccessibilityNodeInfo nodeInfosById = AccessibilityHelper.findNodeInfosById(getRootInActiveWindow(), "com.tencent.mm:id/ht");
+                            AccessibilityNodeInfo nodeInfosById = AccessibilityHelper.findNodeInfosById(getRootInActiveWindow(), "com.tencent.mm:id/hx");
                             AccessibilityHelper.putStringToNodeInfo(nodeInfosById,"");
                             AccessibilityHelper.putStringToNodeInfo(nodeInfosById,WxId);
                             addNewFriendPutText = true;
                         }else {
-                            perforNode("com.tencent.mm:id/bb6");
+                            perforNode("com.tencent.mm:id/baz");
                             addNewFriendToPhoneAdd = true;
                         }
                     }else if (wxPage == 5) {
@@ -209,13 +214,15 @@ public class MyService extends AccessibilityService {
                         }
 
                         if (addNewFriendToPhoneAdd) {
-                            perforNode("com.tencent.mm:id/anb");   //添加通訊錄
+//                            perforNode("com.tencent.mm:id/an_");   //添加通訊錄
+                            performNode("添加到通讯录");
                         }else {
-                            perforNode("com.tencent.mm:id/hx"); //返回
+                            perforNode("com.tencent.mm:id/i2"); //返回
                             addNewFriendToPhoneAdd = true;
                         }
                     } else if (wxPage == 6) {
-                        perforNode("com.tencent.mm:id/hd"); //發送
+                        perforNode("com.tencent.mm:id/hh"); //發送
+//                        performNode("发送");
                         addNewFriendToPhoneAdd = false;
                     }
                     sleepTime(1000);
@@ -247,11 +254,12 @@ public class MyService extends AccessibilityService {
                             }
                         }
                     } else if (wxPage == 5) {
-                        AccessibilityNodeInfo nodeInfosById = AccessibilityHelper.findNodeInfosById(getRootInActiveWindow(), "com.tencent.mm:id/anb");
-                        if (nodeInfosById == null) {
-                            perforNode("com.tencent.mm:id/hx"); //返回
-                            addNewFriendToPhoneAdd = true;
-                        }
+//                        AccessibilityNodeInfo nodeInfosById = AccessibilityHelper.findNodeInfosById(getRootInActiveWindow(), "com.tencent.mm:id/anb");
+//                        if (nodeInfosById == null) {
+////                            perforNode("com.tencent.mm:id/hx"); //返回
+//                            AccessibilityHelper.performBack(this);
+//                            addNewFriendToPhoneAdd = true;
+//                        }
 
                         if (addNewFriendToPhoneAdd) {
                             performNode("添加到通讯录");   //添加通訊錄
@@ -261,7 +269,8 @@ public class MyService extends AccessibilityService {
                             addNewFriendToPhoneAdd = true;
                         }
                     } else if (wxPage == 6) {
-                        perforNode("com.tencent.mm:id/hd"); //發送
+                        perforNode("com.tencent.mm:id/hh"); //發送
+//                        performNode("发送");
                         addNewFriendToPhoneAdd = false;
                     }
                     sleepTime(1000);
@@ -278,7 +287,7 @@ public class MyService extends AccessibilityService {
 
                     performNode("赞");
 
-                    List<AccessibilityNodeInfo> infos = getRootInActiveWindow().findAccessibilityNodeInfosByViewId("com.tencent.mm:id/dbs");
+                    List<AccessibilityNodeInfo> infos = getRootInActiveWindow().findAccessibilityNodeInfosByViewId("com.tencent.mm:id/dao");
                     if (infos != null) {
                         if (infos.size() > likeSize) {
                             AccessibilityNodeInfo like = infos.get(likeSize);
@@ -286,7 +295,7 @@ public class MyService extends AccessibilityService {
                             likeSize++;
                           sleepTime(2000);
                         }else {
-                            AccessibilityNodeInfo nodeInfosById = AccessibilityHelper.findNodeInfosById(getRootInActiveWindow(), "com.tencent.mm:id/deq");
+                            AccessibilityNodeInfo nodeInfosById = AccessibilityHelper.findNodeInfosById(getRootInActiveWindow(), "com.tencent.mm:id/ddn");
                             if (nodeInfosById != null) {
                                 nodeInfosById.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
                                 likeSize = 0;
@@ -303,7 +312,34 @@ public class MyService extends AccessibilityService {
 
     }
 
+    private void performSerachToMain() {
+
+//        AccessibilityNodeInfo aainfos = AccessibilityHelper.findNodeInfosById(getRootInActiveWindow(), "com.tencent.mm:id/ge");
+//        if (aainfos != null) {
+//            AccessibilityHelper.performClick(aainfos);
+//        }
+
+        performNode("添加朋友");
+
+        Log.d(TAG, "performSerachToMain: ToMain");
+        AccessibilityNodeInfo infos = AccessibilityHelper.findNodeInfosById(getRootInActiveWindow(), "com.tencent.mm:id/gd");
+        if(infos!=null)
+            AccessibilityHelper.performClick(infos);
+//        if(infos!=null) Log.d(TAG, "performSerachToMain: ToMain2");
+//        AccessibilityNodeInfo parentParent = infos.getParent();
+//        AccessibilityNodeInfo parentParentParent = parentParent.getParent();
+//
+//        if (parentParentParent != null) {
+//            AccessibilityNodeInfo child = parentParentParent.getChild(0);
+//            CharSequence contentDescription = child.getContentDescription();
+////            Log.d(TAG, contentDescription.toString());
+//            AccessibilityHelper.performClick(child);
+//        }
+    }
+
     private void performNode(String text) {
+
+
         AccessibilityNodeInfo infos = AccessibilityHelper.findNodeInfosByText(getRootInActiveWindow(), text);
         if (infos != null) {
             Log.d(TAG, text);
@@ -410,6 +446,10 @@ public class MyService extends AccessibilityService {
                     WxId = name;
                     setAddNewFriendToText();
                     WeiXinShareUtil.openAppWx(context);
+                    ClipboardManager clipboard = (ClipboardManager) MyApp.getApp().getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("",name);
+                    clipboard.setPrimaryClip(clip);
+                    showToast("微信号码以复制至粘贴板");
                     break;
 
                 case Contast.autolike:         //自动点赞

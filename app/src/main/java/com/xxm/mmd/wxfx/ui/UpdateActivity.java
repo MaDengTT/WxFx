@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +23,7 @@ import com.xxm.mmd.wxfx.BuildConfig;
 import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.ImageAdapter;
+import com.xxm.mmd.wxfx.bean.Team;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
 import com.xxm.mmd.wxfx.utils.GlideLoader;
 
@@ -79,7 +82,15 @@ public class UpdateActivity extends BaseActivity {
         initView();
         initImagePicker();
 
-        initYouMi();
+        if (MyApp.getApp().getUser() != null) {
+            if(MyApp.getApp().getUser().getVip()>0){
+
+            }else {
+                initYouMi();
+            }
+        }else {
+            initYouMi();
+        }
     }
 
 
@@ -170,6 +181,37 @@ public class UpdateActivity extends BaseActivity {
                 }
             }
         });
+        swToTeam.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(final CompoundButton compoundButton, boolean b) {
+                if (compoundButton.isChecked()) {
+                    if (MyApp.getApp().getUser() == null) {
+                        Toast.makeText(UpdateActivity.this, "请登录", Toast.LENGTH_SHORT).show();
+                        Login2Activity.start(UpdateActivity.this);
+                        return;
+                    }
+                    BmobUtils.findCurrentUserTeam(true)
+                            .subscribe(new Consumer<Team>() {
+                                @Override
+                                public void accept(Team team) throws Exception {
+                                    Log.d(TAG, "accept: "+team == null?"aaa":"bbb");
+                                    if (TextUtils.isEmpty(team.getName())) {
+                                        Toast.makeText(UpdateActivity.this, "您还没有团队！请加入团队", Toast.LENGTH_SHORT).show();
+                                        compoundButton.setChecked(false);
+                                    }
+                                }
+                            }, new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) throws Exception {
+                                    Log.e(TAG, "accept: ",throwable );
+                                    Toast.makeText(UpdateActivity.this, "您还没有团队！请加入团队", Toast.LENGTH_SHORT).show();
+                                    compoundButton.setChecked(false);
+                                }
+                            });
+                }
+            }
+        });
+
 
         setTitleName("发送朋友圈");
         editText = findViewById(R.id.et_content);
@@ -213,6 +255,7 @@ public class UpdateActivity extends BaseActivity {
                             @Override
                             public void accept(Throwable throwable) throws Exception {
                                 Log.e(TAG, "accept: ", throwable);
+                                Toast.makeText(UpdateActivity.this, "上传失败", Toast.LENGTH_SHORT).show();
                             }
                         });
             }
@@ -266,6 +309,7 @@ public class UpdateActivity extends BaseActivity {
         imagePicker.setFocusHeight(800);  //裁剪框的高度。单位像素（圆形自动取宽高最小值）
         imagePicker.setOutPutX(1000);//保存文件的宽度。单位像素
         imagePicker.setOutPutY(1000);//保存文件的高度。单位像素
+        imagePicker.setMultiMode(true);
 //        startImage();
     }
 

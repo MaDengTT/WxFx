@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white_Fa"
     tools:context=".ui.PhoneActivity">
 
     <RelativeLayout
@@ -97,22 +98,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_address" />
 
+    <TextView
+        android:id="@+id/tv_empty"
+        app:layout_constraintTop_toTopOf="@id/recycler"
+        app:layout_constraintBottom_toBottomOf="@id/recycler"
+        app:layout_constraintLeft_toLeftOf="@id/recycler"
+        app:layout_constraintRight_toRightOf="@id/recycler"
+        android:background="@color/white"
+        android:text="@string/phone"
+        android:textSize="16sp"
+        android:textColor="@color/contents_text"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
     <Button
         android:id="@+id/but_create"
+        style="@style/but_bg_shape"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/but_bg_share"
         android:text="生成"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recycler" />
 
     <Button
+        android:layout_marginRight="8dp"
+        style="@style/but_bg_shape"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/but_bg_share"
         android:id="@+id/but_putBook"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:text="导入通讯录"
         app:layout_constraintLeft_toLeftOf="@+id/but_create"
         app:layout_constraintRight_toLeftOf="@id/but_clearBook"
@@ -120,10 +141,13 @@
         />
 
     <Button
+        android:layout_marginLeft="8dp"
+        style="@style/but_bg_shape"
+        android:background="@drawable/but_bg_share"
         app:layout_constraintTop_toTopOf="@+id/but_putBook"
         android:id="@+id/but_clearBook"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:text="清空通讯录"
         app:layout_constraintRight_toRightOf="@+id/but_create"
         app:layout_constraintLeft_toRightOf="@+id/but_putBook" />

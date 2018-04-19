@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ui.VipActivity"
+    android:background="@color/white_Fa"
     tools:showIn="@layout/activity_vip">
 
     <android.support.v4.widget.NestedScrollView
@@ -60,7 +61,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="16dp"
                     android:text="48元"
-                    android:textColor="@android:color/holo_red_dark"
+                    android:textColor="#ff0020"
                     android:textSize="24sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/tv2" />
@@ -104,7 +105,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="16dp"
                     android:text="28元"
-                    android:textColor="@android:color/holo_red_dark"
+                    android:textColor="#ff0020"
                     android:textSize="24sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/tv1" />

@@ -21,12 +21,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import c.b.BP;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
-public class VipActivity extends AppCompatActivity {
+public class VipActivity extends BaseActivity {
 
 
     @BindView(R.id.tv_title)
@@ -45,15 +47,20 @@ public class VipActivity extends AppCompatActivity {
     }
 
     @Override
+    protected int getLayoutId() {
+        return R.layout.activity_vip;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vip);
         ButterKnife.bind(this);
 
         initView();
     }
 
     private void initView() {
+        setTitleName("Vip");
         tvSend.setText("F码通道");
         tvSend.setVisibility(View.VISIBLE);
     }
@@ -69,6 +76,67 @@ public class VipActivity extends AppCompatActivity {
                 FCodeActivity.start(this);
                 break;
             case R.id.cl_vip2:
+                DialogHelp.getSelectDialog(this, "支付方式", new String[]{"支付宝", "微信"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        int payInt = 0x11891;
+                        switch (i) {
+                            case 0:
+                                payInt = BP.PayType_Alipay;
+                                break;
+                            case 1:
+                                payInt = BP.PayType_Wechat;
+                                break;
+                        }
+                        if (payInt == 0x11891) {
+                            return;
+                        }
+                        BmobUtils.BmobPay(payInt,"Vip会员","Vip会员",48.0)
+                                .doOnSubscribe(new Consumer<Disposable>() {
+                                    @Override
+                                    public void accept(Disposable disposable) throws Exception {
+                                        waitDialog = DialogHelp.getWaitDialog(VipActivity.this, "支付中");
+                                        waitDialog.show();
+                                    }
+                                }).flatMap(new Function<String, ObservableSource<String>>() {
+                            @Override
+                            public ObservableSource<String> apply(String s) throws Exception {
+                                return BmobUtils.activateVip(1);
+                            }
+                        })
+                                .doOnTerminate(new Action() {
+                                    @Override
+                                    public void run() throws Exception {
+                                        if (waitDialog != null && waitDialog.isShowing()) {
+                                            waitDialog.dismiss();
+                                        }
+                                    }
+                                })
+                                .subscribe(new Observer<String>() {
+                                    @Override
+                                    public void onSubscribe(Disposable d) {
+
+                                    }
+
+                                    @Override
+                                    public void onNext(String s) {
+                                        Toast.makeText(VipActivity.this, s, Toast.LENGTH_SHORT).show();
+                                        Log.d(TAG, "onNext: "+s);
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        Log.e(TAG, "onError: ",e );
+                                        Toast.makeText(VipActivity.this, "失败", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onComplete() {
+
+                                    }
+                                });
+                    }
+                }).show();
                 break;
             case R.id.cl_vip1:
 
@@ -87,12 +155,18 @@ public class VipActivity extends AppCompatActivity {
                         if (payInt == 0x11891) {
                             return;
                         }
-                        BmobUtils.BmobPay(payInt,"普通会员","普通会员",0.1)
+                        BmobUtils.BmobPay(payInt,"普通会员","普通会员",28.0)
                                 .doOnSubscribe(new Consumer<Disposable>() {
                                     @Override
                                     public void accept(Disposable disposable) throws Exception {
                                         waitDialog = DialogHelp.getWaitDialog(VipActivity.this, "支付中");
                                         waitDialog.show();
+                                    }
+                                })
+                                .flatMap(new Function<String, ObservableSource<String>>() {
+                                    @Override
+                                    public ObservableSource<String> apply(String s) throws Exception {
+                                        return BmobUtils.activateVip(1);
                                     }
                                 })
                                 .doOnTerminate(new Action() {
@@ -118,6 +192,7 @@ public class VipActivity extends AppCompatActivity {
                                     @Override
                                     public void onError(Throwable e) {
                                         Log.e(TAG, "onError: ",e );
+                                        Toast.makeText(VipActivity.this, "失败", Toast.LENGTH_SHORT).show();
                                     }
 
                                     @Override
@@ -131,4 +206,7 @@ public class VipActivity extends AppCompatActivity {
                 break;
         }
     }
+
+
+
 }

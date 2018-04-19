@@ -3,7 +3,6 @@ package com.xxm.mmd.wxfx.ui.home;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.service.autofill.Dataset;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
@@ -13,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +21,7 @@ import com.chad.library.adapter.base.loadmore.SimpleLoadMoreView;
 import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.adapter.UserCardAdapter;
+import com.xxm.mmd.wxfx.bean.BannerImage;
 import com.xxm.mmd.wxfx.bean.HomePage;
 import com.xxm.mmd.wxfx.contast.Contast;
 import com.xxm.mmd.wxfx.glide.BannerGlideLoader;
@@ -58,6 +59,8 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
     FloatingActionButton fab;
     @BindView(R.id.srl)
     SwipeRefreshLayout srl;
+    @BindView(R.id.iv_title_back)
+    ImageView ivTitleBack;
     private CardView cvUpdate, cvScan;
 
     ProgressDialog dialog;
@@ -100,16 +103,37 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
         initData();
 
         List<String> images = new ArrayList<>();
-        images.add("http://bmob-cdn-17447.b0.upaiyun.com/2018/03/29/6c2150a6e1d54b80902f45cf2f8e5092.jpg");
-        images.add("http://bmob-cdn-17447.b0.upaiyun.com/2018/03/29/6c2150a6e1d54b80902f45cf2f8e5092.jpg");
-        images.add("http://bmob-cdn-17447.b0.upaiyun.com/2018/03/29/6c2150a6e1d54b80902f45cf2f8e5092.jpg");
-        images.add("http://bmob-cdn-17447.b0.upaiyun.com/2018/03/29/6c2150a6e1d54b80902f45cf2f8e5092.jpg");
-        initBanner(images);
+
+
+
+
         return view;
     }
 
 
     private void initData() {
+
+        BmobUtils.getImage().subscribe(new Observer<BannerImage>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(BannerImage bannerImage) {
+                initBanner(bannerImage.getImageUrls());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e(TAG, "onError: ",e );
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
 
         BmobUtils.findHomeBean(pageSize, pageNo)
                 .subscribe(new Observer<List<HomePage>>() {
@@ -149,14 +173,14 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
     private void setData(List<HomePage> data) {
         if (pageNo == 0) {
             adapter.setNewData(data);
-        }else {
+        } else {
             adapter.addData(data);
         }
 
         if (data.size() == pageSize) {
             adapter.loadMoreComplete();
             pageNo++;
-        }else {
+        } else {
             adapter.loadMoreEnd();
         }
     }
@@ -202,7 +226,7 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
 //                });
 //    }
     private void initView() {
-
+        ivTitleBack.setVisibility(View.GONE);
         waitDialog = DialogHelp.getWaitDialog(getActivity(), "请稍后");
 
         viewTop = getLayoutInflater().inflate(R.layout.home_top, null, false);
@@ -225,7 +249,7 @@ public class HomeFragment extends BaseFrament implements View.OnClickListener {
             public void onLoadMoreRequested() {
                 initData();
             }
-        },recyclerView);
+        }, recyclerView);
         recyclerView.setAdapter(adapter);
 
 

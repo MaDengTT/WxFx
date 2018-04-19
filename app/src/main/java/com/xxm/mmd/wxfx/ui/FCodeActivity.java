@@ -23,7 +23,7 @@ import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 
-public class FCodeActivity extends AppCompatActivity {
+public class FCodeActivity extends BaseActivity {
 
     @BindView(R.id.tv_title)
     TextView tvTitle;
@@ -42,10 +42,15 @@ public class FCodeActivity extends AppCompatActivity {
     }
 
     @Override
+    protected int getLayoutId() {
+        return R.layout.activity_fcode;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fcode);
         ButterKnife.bind(this);
+        setTitleName("F码通道");
     }
 
     private static final String TAG = "FCodeActivity";
@@ -76,6 +81,7 @@ public class FCodeActivity extends AppCompatActivity {
             @Override
             public void onNext(String s) {
                 Toast.makeText(FCodeActivity.this, s, Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(FCodeActivity.this,MainActivity.class));
                 finish();
             }
 

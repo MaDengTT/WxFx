@@ -1,11 +1,13 @@
 package com.xxm.mmd.wxfx.ui.find;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,8 +28,10 @@ import com.xxm.mmd.wxfx.ui.BaseFrament;
 import com.xxm.mmd.wxfx.ui.CreateTeamActivity;
 import com.xxm.mmd.wxfx.ui.Login2Activity;
 import com.xxm.mmd.wxfx.ui.MainActivity;
+import com.xxm.mmd.wxfx.ui.VipActivity;
 import com.xxm.mmd.wxfx.ui.ZxingActivity;
 import com.xxm.mmd.wxfx.utils.BmobUtils;
+import com.xxm.mmd.wxfx.utils.DialogHelp;
 import com.xxm.mmd.wxfx.utils.WeiXinShareUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -132,7 +136,7 @@ public class CircleFragment extends BaseFrament {
                 .subscribe(new Consumer<Team>() {
                     @Override
                     public void accept(Team team) throws Exception {
-                        if (team != null) {
+                        if (team != null&&!TextUtils.isEmpty(team.getObjectId())) {
                             CircleFragment.this.team = team;
                             initData(team.getObjectId());
                         }
@@ -262,7 +266,13 @@ public class CircleFragment extends BaseFrament {
             case R.id.but_create:
 
                 if (MyApp.getApp().getUser().getVip() < 2) {
-                    Toast.makeText(getActivity(), "您的会员等级不足，请升级会员创建", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), "您的会员等级不足，请升级会员创建", Toast.LENGTH_SHORT).show();
+                    DialogHelp.getConfirmDialog(getActivity(), "Vip会员才可以使用此功能！请开通会员！", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            VipActivity.start(getActivity());
+                        }
+                    }).show();
                     return;
                 }
 

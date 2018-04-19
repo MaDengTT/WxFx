@@ -1,5 +1,7 @@
 package com.xxm.mmd.wxfx.bean;
 
+import java.util.ArrayList;
+
 import cn.bmob.v3.BmobObject;
 
 /**
@@ -8,6 +10,16 @@ import cn.bmob.v3.BmobObject;
 
 public class BannerImage extends BmobObject {
     String imageUrl;
+
+    ArrayList<String> ImageUrls;
+
+    public ArrayList<String> getImageUrls() {
+        return ImageUrls;
+    }
+
+    public void setImageUrls(ArrayList<String> imageUrls) {
+        ImageUrls = imageUrls;
+    }
 
     public String getImageUrl() {
         return imageUrl;

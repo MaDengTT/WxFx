@@ -106,4 +106,14 @@
     <string name="title_activity_vip">VipActivity</string>
     <string name="yonhu"><![CDATA[<用户协议>]]></string>
     <string name="title_activity_home_card">HomeCardActivity</string>
+    <string name="addFriendPhoneInfo"> \n 1、 使用通讯录功能生成并导入联系人 \n
+         2、打开微信-通讯录-新的朋友，加载完成导入的新号码 \n
+         3、点击开始即可自动添加好友 \n
+</string>
+    <string name="autolike">
+        \n 点击开始即可自动实现朋友圈点赞功能 \n
+</string>
+    <string name="phone">
+        \n 通过选择条件自动生成500条号码，导入通讯。 \n
+</string>
 </resources>

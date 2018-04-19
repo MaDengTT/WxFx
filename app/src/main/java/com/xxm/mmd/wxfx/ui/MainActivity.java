@@ -154,9 +154,16 @@ public class MainActivity extends AppCompatActivity{
         transaction.show(fragments[index]).commitAllowingStateLoss();
     }
 
+    long oldTiem = 0;
     @Override
     public void onBackPressed() {
-
+        long current = System.currentTimeMillis();
+        if (current - oldTiem <= 2000) {
+            finish();
+        }else {
+            Toast.makeText(this, "连点两次退出", Toast.LENGTH_SHORT).show();
+            oldTiem = current;
+        }
     }
 
 
@@ -232,7 +239,9 @@ public class MainActivity extends AppCompatActivity{
         }
     }
     public void startZxing() {
-
+        Intent intent = new Intent(this, ZxingActivity.class);
+        intent.putExtra(ZxingActivity.TEAM_S, ZxingActivity.NOT_TEAM);
+        this.startActivityForResult(intent, MainActivity.REQUEST_CODE);
     }
 
     public void startZxingToTeam() {

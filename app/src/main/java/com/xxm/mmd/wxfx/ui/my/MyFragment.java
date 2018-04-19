@@ -152,6 +152,12 @@ public class MyFragment extends Fragment {
 
 
             GlideLoader.loadAvatar(ivAvatar,MyApp.getApp().getUser().getUseravatar());
+            rlMyOrder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    VipActivity.start(getActivity());
+                }
+            });
             tvUserInfo.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -224,7 +230,11 @@ public class MyFragment extends Fragment {
                         .subscribe(new Consumer<Team>() {
                             @Override
                             public void accept(Team team) throws Exception {
-                                TeamActivity.start(getActivity(),team);
+                                if (TextUtils.isEmpty(team.getObjectId())) {
+                                    Toast.makeText(getActivity(), "您还没有团队！请加入团队", Toast.LENGTH_SHORT).show();
+                                }else {
+                                    TeamActivity.start(getActivity(),team);
+                                }
                             }
                         }, new Consumer<Throwable>() {
                             @Override

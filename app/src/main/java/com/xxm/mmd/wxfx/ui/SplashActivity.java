@@ -19,6 +19,7 @@ import com.qq.e.comm.util.AdError;
 import com.xxm.mmd.wxfx.MyApp;
 import com.xxm.mmd.wxfx.R;
 import com.xxm.mmd.wxfx.utils.PermissionHelper;
+import com.xxm.mmd.wxfx.utils.PrefUtils;
 
 import abc.abc.abc.AdManager;
 import abc.abc.abc.nm.cm.ErrorCode;
@@ -78,6 +79,12 @@ public class SplashActivity extends BaseActivity implements SplashADListener{
                 // 如果还有权限为申请，而且系统版本大于23，执行申请权限逻辑
                 permissionHelper.applyPermissions();
             }
+        }
+
+
+        if (PrefUtils.getBoolean(this, "isOneOpen", true)) {
+            PrefUtils.putBoolean(this,"isOneOpen",true);
+            PrefUtils.putInt(this,"TestNum",3);
         }
 
 //        MainActivity.start(this);

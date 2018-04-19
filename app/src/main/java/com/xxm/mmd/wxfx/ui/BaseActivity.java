@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,8 +28,31 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
         setTitleName(getTitle().toString());
+        setBack();
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
+
+    protected void showBack(boolean ifShow) {
+        View viewById = findViewById(R.id.iv_title_back);
+        if (viewById != null) {
+            if (ifShow) {
+                viewById.setVisibility(View.VISIBLE);
+            }else {
+                viewById.setVisibility(View.GONE);
+            }
+        }
+    }
+    protected  void setBack(){
+        View viewById = findViewById(R.id.iv_title_back);
+        if (viewById != null) {
+            viewById.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    finish();
+                }
+            });
+        }
+    };
 
     public void setTitleName(String s) {
         TextView title = findViewById(R.id.tv_title);

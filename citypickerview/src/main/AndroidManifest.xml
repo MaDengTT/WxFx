@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.lljjcoder.style.citypickerview">
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name="com.lljjcoder.style.citylist.CityListSelectActivity">
+        </activity>
+        <activity android:name="com.lljjcoder.style.citythreelist.ProvinceActivity">
+        </activity>
+        <activity android:name="com.lljjcoder.style.citythreelist.CityActivity">
+        </activity>
+        <activity android:name="com.lljjcoder.style.citythreelist.AreaActivity">
+        </activity>
+    </application>
+
+</manifest>

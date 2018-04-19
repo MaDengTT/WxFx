@@ -302,5 +302,7 @@ public class SettingActivity extends BaseActivity implements AccessibilityManage
         BmobUser.logOut();
         EventBus.getDefault().post(new UserBean());
         Toast.makeText(this, "用户以退出", Toast.LENGTH_SHORT).show();
+        Login2Activity.start(this);
+        finish();
     }
 }

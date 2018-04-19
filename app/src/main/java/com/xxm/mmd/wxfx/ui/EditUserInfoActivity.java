@@ -153,6 +153,7 @@ public class EditUserInfoActivity extends AppCompatActivity {
         getImagePicker().setOutPutX(1000);                         //保存文件的宽度。单位像素
         getImagePicker().setOutPutY(1000);                         //保存文件的高度。单位像素
 
+
     }
 
 
@@ -193,6 +194,9 @@ public class EditUserInfoActivity extends AppCompatActivity {
     }
 
     protected void takeSuccess(List<ImageItem> images) {
+        if (images.size() == 0) {
+            return;
+        }
         path = images.get(0).path;
         com.xxm.mmd.wxfx.glide.GlideLoader.loadAvatar(ivAvatar, path);
     }
